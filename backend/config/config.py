@@ -3,10 +3,10 @@ from utils.utils import logger
 
 
 class Config:
-    DB_NAME = 'gbk'
+    DB_NAME = 'mayne'
     COL_NAME = 'config'
     VERSION = "0.2.0"
-    VERSION_API = "v2"
+    VERSION_API = "v1"
 
     def __init__(self):
         self.data_default = {
