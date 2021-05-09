@@ -1,0 +1,7 @@
+flask
+requests
+werkzeug
+flask_cors
+colorlog
+pymongo
+flask-restful
