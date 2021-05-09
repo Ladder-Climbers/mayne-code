@@ -14,7 +14,7 @@ logger_werkzeug.setLevel(logging.ERROR)
 # 中间件
 dm = DispatcherMiddleware(app_file,
                           {
-                              config.data.get('api_prefix', '/api/v2'): app_api
+                              config.data['api_server'].get('api_prefix', '/api/v2'): app_api
                           }
                           )
 
