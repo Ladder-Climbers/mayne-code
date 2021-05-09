@@ -28,7 +28,7 @@ export default function Recomends() {
   const books = [
     {
       title: "fangguojieryuan",
-      author: "ha",
+      author: "haha",
       desc: "a small book",
       cover: "https://tse1-mm.cn.bing.net/th/id/OIP.k7lJNlhDglQEC5j6mSlNVwHaJ9?w=192&h=258&c=7&o=5&dpr=1.25&pid=1.7"
     },
