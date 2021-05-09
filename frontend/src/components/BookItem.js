@@ -43,7 +43,7 @@ export default function BookItem(props) {
             open={Boolean(anchorEl)}
             onClose={() => setAnchorEl(null)}
             anchorEl={anchorEl}>
-            <MenuItem>删除</MenuItem>
+            <MenuItem>删除了</MenuItem>
           </Menu>
         </Box>
       }
