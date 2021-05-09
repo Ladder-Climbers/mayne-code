@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { Card, CardActions, CardContent, CardHeader, CardMedia, Collapse, Container, IconButton, makeStyles, Typography } from "@material-ui/core";
+import { Box, Card, CardActions, CardContent, CardHeader, CardMedia, Collapse, Container, IconButton, makeStyles, Menu, MenuItem, Typography } from "@material-ui/core";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -31,12 +31,21 @@ export default function BookItem(props) {
   const classes = useStyles();
   const { book } = props;
   const [expanded, setExpanded] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
   return (<Card className={classes.root}>
     <CardHeader
       action={
-        <IconButton>
-          <MoreVertIcon />
-        </IconButton>
+        <Box>
+          <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
+            anchorEl={anchorEl}>
+            <MenuItem>删除</MenuItem>
+          </Menu>
+        </Box>
       }
       title={book.title}
       subheader={book.author}
@@ -71,8 +80,9 @@ export default function BookItem(props) {
     </CardActions>
     <Collapse in={expanded} timeout="auto" unmountOnExit>
       <CardContent>
-        None
+        NONE
       </CardContent>
+
     </Collapse>
   </Card>);
 };
