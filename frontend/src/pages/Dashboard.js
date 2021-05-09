@@ -42,7 +42,7 @@ export default function Dashboard() {
           value={searchValue}></TextField>
       </Grid>
       <Grid item xs={1}>
-        <Button variant="contained" color="secondary" onClick={handleSeach}>搜索</Button>
+        <Button variant="contained" color="primary" onClick={handleSeach}>搜索</Button>
       </Grid>
       <Grid item xs={2}></Grid>
     </Grid>

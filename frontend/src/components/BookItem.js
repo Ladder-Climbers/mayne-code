@@ -62,7 +62,7 @@ export default function BookItem(props) {
         className={clsx(classes.expand, {
           [classes.expandOpen]: expanded,
         })}
-        onClick={() => { setExpanded(false); }}
+        onClick={() => { setExpanded(!expanded); }}
         aria-expanded={expanded}
         aria-label="show more"
       >
