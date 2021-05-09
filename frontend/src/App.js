@@ -15,14 +15,16 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import SettingsIcon from '@material-ui/icons/Settings';
 import CloseIcon from '@material-ui/icons/Close';
 import StorageIcon from '@material-ui/icons/Storage';
-
-import Dashboard from './pages/Dashboard';
 import { AppBar, CssBaseline, Divider, Drawer, IconButton, List, makeStyles, Toolbar, useTheme } from '@material-ui/core';
 import ListItemLink from './components/ListItemLink';
+
+import Dashboard from './pages/Dashboard';
+import Library from "./pages/Library";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -98,7 +100,7 @@ function App() {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const titleDefault = "Mayne";
+  const titleDefault = "Mayne的大图书馆";
   const [title, setTitle] = React.useState(titleDefault);
   // 拉大到800会打开，拉小到600关闭
   const triggerWidthOpen = 800;
@@ -191,13 +193,17 @@ function App() {
             <Divider />
             <List onClick={handleClickAction}>
               <ListItemLink to="/" primary="启动页" icon={<DashboardIcon />} />
+              <ListItemLink to="/library" primary="馆藏" icon={<LibraryBooksIcon />} />
             </List>
           </Drawer>
           <main className={classes.content}>
             <div className={classes.toolbar} />
             <Switch>
-              <Route path={"/"} exact={true}>
+            <Route path={"/"} exact={true}>
                 <Dashboard></Dashboard>
+              </Route>
+              <Route path={"/library"} exact={true}>
+                <Library></Library>
               </Route>
             </Switch>
           </main>
