@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && rd /s /Q ..\\backend\\public && md ..\\backend\\public && xcopy /E build\\* ..\\backend\\public\\ && echo 构建完成。",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

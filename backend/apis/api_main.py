@@ -20,9 +20,19 @@ class MainAPI(Resource):
         }
 
 
+class Test(Resource):
+    def get(self):
+        return {
+            'code': 200,
+            'test': True
+        }
+
+
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 api.add_resource(MainAPI, '/')
+api.add_resource(Test, '/test')
 
 if __name__ == '__main__':
     app.run()
