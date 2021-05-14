@@ -7,6 +7,7 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
 import BookItem from "../components/BookItem";
+import { Box, Button } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,17 +64,21 @@ export default function Recomends() {
       cover: "https://tse1-mm.cn.bing.net/th/id/OIP.k7lJNlhDglQEC5j6mSlNVwHaJ9?w=192&h=258&c=7&o=5&dpr=1.25&pid=1.7"
     },
   ];
-  return (<GridList cellHeight={500} className={classes.gridList}>
-    {/* <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
+  return (<Box>
+    <Button fullWidth>刷新</Button>
+    <br />
+    <GridList cellHeight={500} className={classes.gridList}>
+      {/* <GridListTile key="Subheader" cols={2} style={{ height: 'auto' }}>
       <ListSubheader component="div">December</ListSubheader>
     </GridListTile> */}
-    {books.map((v, k) => {
-      return <GridListTile key={k}>
-        <BookItem book={v}></BookItem>
-      </GridListTile>;
-    })}
-    {/* {tileData.map((tile) => (
+      {books.map((v, k) => {
+        return <GridListTile key={k}>
+          <BookItem book={v}></BookItem>
+        </GridListTile>;
+      })}
+      {/* {tileData.map((tile) => (
       
     ))} */}
-  </GridList>);
+    </GridList>
+  </Box>);
 };
