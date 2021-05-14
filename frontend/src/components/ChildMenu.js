@@ -9,14 +9,19 @@ import useScrollTrigger from '@material-ui/core/useScrollTrigger';
 const useStyles = makeStyles({
   root: {
     width: 500,
-    display:'flex',
+    display: 'flex',
 
   },
 });
 
-export default function SimpleBottomNavigation() {
+export default function SimpleBottomNavigation(props) {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
+  const trigger = useScrollTrigger({
+    // target:window ? window():undefined,
+    disableHysteresis: true,
+    threshold: 100,
+  });
 
   return (
     <BottomNavigation
@@ -27,17 +32,19 @@ export default function SimpleBottomNavigation() {
       showLabels
       className={classes.root}
     >
-      <BottomNavigationAction label="Top" icon={<ArrowUpwardIcon onClick={arrowUpwardIcon(...this.props)}/>}  />
+      {/* <BottomNavigationAction label="Top" icon={<ArrowUpwardIcon onClick={() => {arrowUpwardIcon(...this.props)}} />} /> */}
+      {trigger ? <div>TEST ON</div> : <div>TEST OFF</div>}
+      <BottomNavigationAction label="Top" icon={<ArrowUpwardIcon />} />
       <BottomNavigationAction label="Favorites" icon={<FavoriteIcon />} />
       <BottomNavigationAction label="Nearby" icon={<LocationOnIcon />} />
     </BottomNavigation>
   );
 }
-function arrowUpwardIcon(props){//To top
-  const {ArrowUpwardIcon,window}=props;
-  const trigger = useScrollTrigger({
-    target:window ? window():undefined,
-    disableHysteresis:true,
-    threshold:100,
-  });
-}
+// function arrowUpwardIcon(props) {//To top
+//   const { ArrowUpwardIcon } = props;
+//   const trigger = useScrollTrigger({
+//     // target:window ? window():undefined,
+//     disableHysteresis: true,
+//     threshold: 100,
+//   });
+// }
