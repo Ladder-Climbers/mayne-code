@@ -33,7 +33,7 @@ export default function SimpleBottomNavigation() {
     </BottomNavigation>
   );
 }
-function arrowUpwardIcon(props){
+function arrowUpwardIcon(props){//To top
   const {ArrowUpwardIcon,window}=props;
   const trigger = useScrollTrigger({
     target:window ? window():undefined,

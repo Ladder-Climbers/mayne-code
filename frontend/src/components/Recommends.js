@@ -31,37 +31,37 @@ export default function Recomends() {
       title: "fangguojieryuan",
       author: "haha",
       desc: "a small book",
-      cover: "https://tse1-mm.cn.bing.net/th/id/OIP.k7lJNlhDglQEC5j6mSlNVwHaJ9?w=192&h=258&c=7&o=5&dpr=1.25&pid=1.7"
+      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
     },
     {
       title: "fangguojieryuan2",
       author: "ha",
       desc: "a small book",
-      cover: "https://tse1-mm.cn.bing.net/th/id/OIP.k7lJNlhDglQEC5j6mSlNVwHaJ9?w=192&h=258&c=7&o=5&dpr=1.25&pid=1.7"
+      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
     },
     {
       title: "fangguojieryuan",
       author: "ha",
       desc: "a small book",
-      cover: "https://tse1-mm.cn.bing.net/th/id/OIP.k7lJNlhDglQEC5j6mSlNVwHaJ9?w=192&h=258&c=7&o=5&dpr=1.25&pid=1.7"
+      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
     },
     {
       title: "fangguojieryuan2",
       author: "ha",
       desc: "a small book",
-      cover: "https://tse1-mm.cn.bing.net/th/id/OIP.k7lJNlhDglQEC5j6mSlNVwHaJ9?w=192&h=258&c=7&o=5&dpr=1.25&pid=1.7"
+      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
     },
     {
       title: "fangguojieryuan",
       author: "ha",
       desc: "a small book",
-      cover: "https://tse1-mm.cn.bing.net/th/id/OIP.k7lJNlhDglQEC5j6mSlNVwHaJ9?w=192&h=258&c=7&o=5&dpr=1.25&pid=1.7"
+      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
     },
     {
       title: "fangguojieryuan2",
       author: "ha",
       desc: "a small book",
-      cover: "https://tse1-mm.cn.bing.net/th/id/OIP.k7lJNlhDglQEC5j6mSlNVwHaJ9?w=192&h=258&c=7&o=5&dpr=1.25&pid=1.7"
+      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
     },
   ];
   return (<Box>
