@@ -5,9 +5,13 @@ import { api } from "../api/api";
 import SearchBox from '../components/SearchBox';
 import PopularAuthors from '../components/PopularAuthors';
 import PopularTags from '../components/PopularTags';
+import Slides from '../components/Slides';
 export default function Dashboard() {
   return (<Container>
     <SearchBox></SearchBox>
+    <br />
+    <Divider></Divider>
+    <Slides></Slides>
     <br />
     <Divider></Divider>
     <br />
