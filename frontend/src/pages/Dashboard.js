@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Container, Divider, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@material-ui/core";
 import Recomends from "../components/Recommends";
 import { api } from "../api/api";
-
+import BottomNavigation from "../components/ChildMenu"
 export default function Dashboard() {
   const [searchValue, setSearchValue] = React.useState('');
   const searchTypeList = [
@@ -45,10 +45,12 @@ export default function Dashboard() {
         <Button variant="contained" color="primary" onClick={handleSeach}>搜索</Button>
       </Grid>
       <Grid item xs={2}></Grid>
+      <Grid item xs ={6}></Grid>
     </Grid>
     <br />
     <Divider></Divider>
     <br />
     <Recomends></Recomends>
+    <BottomNavigation></BottomNavigation>
   </Container>);
 };
