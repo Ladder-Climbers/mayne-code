@@ -11,8 +11,9 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: 345,
   },
   media: {
-    height: 0,
-    paddingTop: '56.25%', // 16:9
+    // height: 0,
+    // paddingTop: '56.25%', // 16:9
+    paddingTop: '100%', // 16:9
   },
   expand: {
     transform: 'rotate(0deg)',
@@ -33,7 +34,7 @@ export default function BookItem(props) {
   const [expanded, setExpanded] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   return (<Card className={classes.root}>
-    <CardHeader
+    {/* <CardHeader
       action={
         <Box>
           <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
@@ -49,24 +50,34 @@ export default function BookItem(props) {
       }
       title={book.title}
       subheader={book.author}
-    />
+    /> */}
     <CardMedia
       className={classes.media}
       image={book.cover}
       title={book.title}
+      onClick={(e) => {
+        e.stopPropagation();
+        console.log('to visit title:', book.title);
+      }}
     />
-    <CardContent>
-      <Typography variant="body2" color="textSecondary" component="p">
-        {book.desc}
-      </Typography>
-    </CardContent>
-    <CardActions disableSpacing>
-      <IconButton>
-        <FavoriteIcon />
-      </IconButton>
-      <IconButton>
-        <ShareIcon />
-      </IconButton>
+    {/* <CardContent>
+      
+    </CardContent> */}
+    <CardActions disableSpacing onClick={() => { setExpanded(!expanded); }}>
+      <Box style={{ float: "left" }}>
+        <Typography variant="h6" color="textPrimary" component="p" onClick={(e) => {
+          e.stopPropagation();
+          console.log('to visit title:', book.title);
+        }}>
+          {book.title}
+        </Typography>
+        <Typography variant="h6" color="textSecondary" component="p" onClick={(e) => {
+          e.stopPropagation();
+          console.log('to visit author:', book.author);
+        }}>
+          {book.author}
+        </Typography>
+      </Box>
       <IconButton
         className={clsx(classes.expand, {
           [classes.expandOpen]: expanded,
@@ -79,10 +90,17 @@ export default function BookItem(props) {
       </IconButton>
     </CardActions>
     <Collapse in={expanded} timeout="auto" unmountOnExit>
-      <CardContent>
-        NONE
-      </CardContent>
-
+      <Container>
+        <Typography variant="body2" color="textSecondary" component="p">
+          {book.desc}
+        </Typography>
+        <IconButton>
+          <FavoriteIcon />
+        </IconButton>
+        <IconButton>
+          <ShareIcon />
+        </IconButton>
+      </Container>
     </Collapse>
   </Card>);
 };

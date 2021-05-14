@@ -16,7 +16,9 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+import GroupIcon from '@material-ui/icons/Group';
 import WebIcon from '@material-ui/icons/Web';
+import LiveHelpIcon from '@material-ui/icons/LiveHelp';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import SettingsIcon from '@material-ui/icons/Settings';
 import CloseIcon from '@material-ui/icons/Close';
@@ -27,6 +29,8 @@ import ListItemLink from './components/ListItemLink';
 import Dashboard from './pages/Dashboard';
 import Library from "./pages/Library";
 import Services from "./pages/Services";
+import About from './pages/About';
+import Help from './pages/Help';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -197,6 +201,8 @@ function App() {
               <ListItemLink to="/" primary="启动页" icon={<DashboardIcon />} />
               <ListItemLink to="/library" primary="馆藏" icon={<LibraryBooksIcon />} />
               <ListItemLink to="/services" primary="服务" icon={<WebIcon />} />
+              <ListItemLink to="/help" primary="帮助" icon={<LiveHelpIcon />} />
+              <ListItemLink to="/about" primary="关于" icon={<GroupIcon />} />
             </List>
           </Drawer>
           <main className={classes.content}>
@@ -210,6 +216,12 @@ function App() {
               </Route>
               <Route path={"/services"} exact={true}>
                 <Services></Services>
+              </Route>
+              <Route path={"/help"} exact={true}>
+                <Help></Help>
+              </Route>
+              <Route path={"/about"} exact={true}>
+                <About></About>
               </Route>
             </Switch>
           </main>
