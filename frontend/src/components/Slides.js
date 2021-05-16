@@ -22,7 +22,7 @@ export default function Slides(props) {
     if(i==images.length-1){
       i=-1;
     }
-  },10000);
+  },5000);
   /*setInterval(function() { 
     for(var i=0;i<images.length;i++)
     {setImage(images[i])
