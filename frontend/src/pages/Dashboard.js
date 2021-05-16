@@ -15,11 +15,11 @@ export default function Dashboard() {
     <br />
     <Divider></Divider>
     <br />
-    <Grid container spacing={30}>
-      <Grid lg={6} sm={12} style={{ padding: 20 }}>
+    <Grid container spacing={10}>
+      <Grid item lg={6} sm={12} style={{ padding: 20 }}>
         <PopularAuthors></PopularAuthors>
       </Grid>
-      <Grid lg={6} sm={12} style={{ padding: 20 }}>
+      <Grid item lg={6} sm={12} style={{ padding: 20 }}>
         <PopularTags></PopularTags>
       </Grid>
     </Grid>
