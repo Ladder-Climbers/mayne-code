@@ -1,7 +1,5 @@
 
 import React from "react";
-import classes from "*.module.css";
-import clsx from 'clsx';
 import { Box, Button, makeStyles, Paper } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) =>({
@@ -22,7 +20,7 @@ export default function Slides(props) {
     i=0;
   }
  },4000);
-  return (<Paper className={classes.root}>
+  return (<Paper>
     <img src={image}></img>
     <Box style={{ display: "flex" }}>
       {images.map((v, k) => <Button key={k} onClick={() => { setImage(images[k]) }}>{k}</Button>)}
