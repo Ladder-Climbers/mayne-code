@@ -13,7 +13,8 @@ class Constants:
     OWNER = "Chiro"
     EMAIL = "Chiro2001@163.com"
     # Find
-    FIND_LIMIT = 30
+    # FIND_LIMIT = 30
+    FIND_LIMIT = 8
     # JWT config
     JWT_SECRET_KEY = secrets.SECRET_WORDS
     JWT_HEADER_TYPE = ""
@@ -71,7 +72,7 @@ class Constants:
 class Statics:
     tjw_access_token = TJWSS(Constants.JWT_SECRET_KEY, Constants.JWT_ACCESS_TIME)
     tjw_refresh_token = TJWSS(Constants.JWT_SECRET_KEY, Constants.JWT_REFRESH_TIME)
-    rpc_spider_go = RPCTarget('127.0.0.1', 9091)
+    rpc_spider_go = RPCTarget('127.0.0.1', 9091, path='rpc/v1/bookfinder')
     rpc_spider_nodejs = RPCTarget('127.0.0.1', 9092)
 
 

@@ -14,28 +14,6 @@ func makeUpSearchWord(platform string, keyword string) string {
 	return keyword + " 书 site:" + args.Sites[platform]
 }
 
-// 旧的实现必应搜索的方式。已经废弃
-/*func getBingItems(url string) []string {
-	client := http.Client{}
-	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("User-Agent", args.HeaderArgs.UserAgent)
-	req.Header.Set("Cookie", args.HeaderArgs.Cookie)
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Error(s) occurred while making requests.")
-	}
-	defer resp.Body.Close()
-	var listURL []string
-	document, _ := goquery.NewDocumentFromReader(resp.Body)
-	document.Find("li.b_algo").Each(func(_ int, selection *goquery.Selection) {
-		s := selection.Find("a").First()
-		link, _ := s.Attr("href")
-		// log.Printf("Page `%s`: %s\n", s.Text(), link)
-		listURL = append(listURL, link)
-	})
-	return listURL
-}*/
-
 func visitLink(url string) string {
 	client := http.Client{}
 	req, _ := http.NewRequest("GET", url, nil)
@@ -52,7 +30,8 @@ func visitLink(url string) string {
 	return buf.String()
 }
 
-func parseBooks(paragraph string, bookList map[string]int) {
+func parseBooks(paragraph string, bookList map[string]int, group *sync.WaitGroup) {
+	defer group.Done()
 	reg := regexp.MustCompile("《.*?》")
 	bookItems := reg.FindAllStringSubmatch(paragraph, -1)
 	for _, book := range bookItems {
@@ -63,7 +42,11 @@ func parseBooks(paragraph string, bookList map[string]int) {
 
 func FindBook(platform, keyword string, blist map[string]int, group *sync.WaitGroup) {
 	defer group.Done()
-	for _, link := range bing.BingSearch(makeUpSearchWord(platform, keyword), args.BingAPIToken) {
-		parseBooks(visitLink(link), blist)
+	bingResult := bing.BingSearch(makeUpSearchWord(platform, keyword), args.BingAPIToken)
+	var wg sync.WaitGroup
+	wg.Add(len(bingResult))
+	for _, link := range bingResult {
+		go parseBooks(visitLink(link), blist, &wg)
 	}
+	wg.Wait()
 }

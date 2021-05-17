@@ -5,5 +5,4 @@ flask_cors
 colorlog
 pymongo
 flask-restful
-json-rpc
 itsdangerous

@@ -6,12 +6,15 @@ type WebArgs struct {
 }
 
 type Book struct {
-	Name      string `json:"name"`
-	Author    []string `json:"author"`
-	Publisher string `json:"publisher"`
-	ISBN      string `json:"isbn"`
-	CoverURL  string `json:"cover_url"`
-	DoubanURL string `json:"douban_url"`
+	Id int `json:"id"`
+	Title string `json:"title"`
+	URL string `json:"url"`
+	CoverURL string `json:"cover_url"`
+	Abstract string `json:"abstract"`
+	Rating struct{
+		StarCount float32 `json:"star_count"`
+		Value float32 `json:"value"`
+	} `json:"rating"`
 }
 
 type ReqMessage struct {

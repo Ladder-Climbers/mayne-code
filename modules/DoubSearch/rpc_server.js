@@ -3,10 +3,8 @@ let doub = require("./douban");
 
 // 创建 RPC Server
 const server = new jayson.server({
-  search: async (args, callback) => {
-    const result = await doub.search(args[0], args[1]);
-    // console.log('result', result);
-    callback(null, result);
+  search: (args, callback) => {
+    doub.search(args[0], args[1]).then(result => callback(null, result));
   }
 });
 

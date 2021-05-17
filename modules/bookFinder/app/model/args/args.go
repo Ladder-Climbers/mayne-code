@@ -7,3 +7,5 @@ var ServicePort int
 var ServiceAPI string
 var Sites map[string]string
 var BingAPIToken string
+var DoubPort int
+var DoubAPI string

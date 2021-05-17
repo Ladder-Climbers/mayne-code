@@ -2,8 +2,6 @@ import json
 import datetime
 from pytz import tzinfo
 import pytz
-import tzlocal
-from apscheduler.triggers.cron.fields import BaseField
 
 
 class DefaultResultEncoder(json.JSONEncoder):
@@ -18,13 +16,6 @@ class DefaultResultEncoder(json.JSONEncoder):
             return str(obj)
         elif isinstance(obj, datetime.timedelta):
             return str(obj)
-        elif issubclass(type(obj), BaseField):
-            return {
-                'type': 'field',
-                'class_name': obj.__class__.__name__,
-                "name": obj.name,
-                "expressions": str(obj)
-            }
         return json.JSONEncoder.default(self, obj)
 
 

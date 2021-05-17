@@ -1,7 +1,9 @@
 package api
 
 import (
+	"bookFinder/app/model/args"
 	"bookFinder/app/model/types"
+	"bookFinder/app/service/douban"
 	"bookFinder/app/service/finder"
 	"errors"
 	"net/http"
@@ -11,18 +13,18 @@ import (
 
 type BookFinder struct {}
 
-func (bf *BookFinder) FindBook(r *http.Request, args *types.ReqMessage, result *types.RetMessage) error {
-	if args.Type != "request" {
+func (bf *BookFinder) FindBook(r *http.Request, params *types.ReqMessage, rets *types.RetMessage) error {
+	if params.Type != "request" {
 		return errors.New("invalid message type")
 	}
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(len(args.Sites))
 	// blist 是一个 map，存储 书名—出现次数 键值对
 	blist := make(map[string]int)
 
-	go finder.FindBook("zhihu", args.Request, blist, &wg)
-	go finder.FindBook("csdn", args.Request, blist, &wg)
-	go finder.FindBook("jianshu", args.Request, blist, &wg)
+	for platform, _ := range(args.Sites) {
+		go finder.FindBook(platform, params.Request, blist, &wg)
+	}
 	wg.Wait()
 
 	type nameCount struct {
@@ -37,22 +39,19 @@ func (bf *BookFinder) FindBook(r *http.Request, args *types.ReqMessage, result *
 		})
 	}
 
-	// 排序
 	sort.Slice(rlist, func(i, j int) bool { return rlist[i].bookCount > rlist[j].bookCount })
 
 	var bookList []types.Book
 	i := 0
 	for _, _ = range rlist {
-		if i == args.Count {
+		if i == params.Count {
 			break
 		}
-		bookList = append(bookList, types.Book{
-			Name:      rlist[i].bookName[3:len(rlist[i].bookName) - 3],
-			Author:    nil,
-		})
+		bookList = append(bookList, types.Book{Title: rlist[i].bookName[3:len(rlist[i].bookName) - 3]})
+		bookList[i] = douban.DoubanSearch(bookList[i].Title)
 		i++
 	}
-	*result = types.RetMessage{
+	*rets = types.RetMessage{
 		Type:  "result",
 		Books: bookList,
 	}
