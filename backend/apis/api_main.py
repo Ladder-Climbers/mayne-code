@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Resource, Api
-from utils.utils import logger, get_class_docs
+from utils.logger import logger
+from utils.docs import get_class_docs
 
 
 class MainAPI(Resource):

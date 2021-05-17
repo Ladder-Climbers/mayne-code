@@ -1,7 +1,8 @@
 import os
 from flask import Flask, send_file
-from utils.utils import logger, get_static_file_path, is_file_path_legal
-from config.config import config
+from utils.logger import logger
+from utils.file_static import get_static_file_path, is_file_path_legal
+from data.config import config
 
 app = Flask(__name__, static_folder=config.data['file_server']['static_path'])
 
@@ -9,7 +10,6 @@ app = Flask(__name__, static_folder=config.data['file_server']['static_path'])
 # 统一错误处理信息
 @app.errorhandler(404)
 def handler_404(error):
-    # TODO: 添加404页面
     logger.error(f"{error}")
     return f"<p>{error}</p><br><p>你来到了知识的荒原——</p>"
 

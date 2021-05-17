@@ -118,3 +118,4 @@ dmypy.json
 .idea/
 electron-build/
 
+node_modules/
