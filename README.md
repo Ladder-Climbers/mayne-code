@@ -63,4 +63,9 @@
 
 ### 内容来源
 
-1. [计算机书籍控](http://bestcbooks.com/)
+1. [豆瓣](https://search.douban.com/book/subject_search?search_text=%E4%B8%89%E4%BD%93&cat=1001&start=15)
+2. https://www.jiumodiary.com/
+3. [PDF之家](http://pdfzj.cn/)
+4. [搬书~~酱~~匠](http://www.banshujiang.cn/)
+5. [书格网](https://new.shuge.org/collections/)
+6. [深圳文献港](http://szdnet.cceu.org.cn/primo_library/libweb/action/search.do)

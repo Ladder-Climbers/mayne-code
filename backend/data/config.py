@@ -3,7 +3,7 @@ import pymongo
 from utils.logger import logger
 import secrets
 from itsdangerous import TimedJSONWebSignatureSerializer as TJWSS
-from utils.rpc_tools import *
+from utils.rpc_type import *
 from pytz import utc
 
 
@@ -67,13 +67,41 @@ class Constants:
         'DoubSearch': None,
         "bookFinder": "go run main.go"
     }
+    # Search
+    SEARCH_DEFAULT = "smart_search"
+    SEARCH_SRC = {
+        'smart_search': {
+            'type': 'rpc',
+            'params_type': 'rpc_smart_search',
+            'call_name': 'BookFinder.FindBook'
+        },
+        'bing': {
+            'type': 'function',
+            'params_type': 'kwargs'
+        },
+        'douban': {
+            'type': 'rpc',
+            'params_type': "rpc",
+            'call_name': 'search'
+        },
+        'szdnet': {
+            'type': 'function',
+            'params_type': 'kwargs'
+        },
+        'local_database': {
+            'type': 'database',
+            'params_type': 'kwargs'
+        }
+    }
 
 
 class Statics:
     tjw_access_token = TJWSS(Constants.JWT_SECRET_KEY, Constants.JWT_ACCESS_TIME)
     tjw_refresh_token = TJWSS(Constants.JWT_SECRET_KEY, Constants.JWT_REFRESH_TIME)
-    rpc_spider_go = RPCTarget('127.0.0.1', 9091, path='rpc/v1/bookfinder')
-    rpc_spider_nodejs = RPCTarget('127.0.0.1', 9092)
+    rpcs = {
+        'smart_search': RPCTarget('127.0.0.1', 9091, path='rpc/v1/bookfinder'),
+        'douban': RPCTarget('127.0.0.1', 9092)
+    }
 
 
 class Config:
