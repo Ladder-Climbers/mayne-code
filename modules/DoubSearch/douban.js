@@ -1566,7 +1566,7 @@ function decrypt(r) {
 }
 
 const search = async (key, page = 0) => {
-    const url = 'https://search.douban.com/book/subject_search?search_text=${encodeURIComponent(key)}&cat=1001&start=${page * 15}';
+    const url = `https://search.douban.com/book/subject_search?search_text=${encodeURIComponent(key)}&cat=1001&start=${page * 15}`;
     // const resp = await fetch(url, {
     //     // headers: {
     //     //     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0',
@@ -1588,8 +1588,8 @@ const search = async (key, page = 0) => {
     //         "Cache-Control": "no-cache"
     //     },
     // })
-    const resp = await fetch("https://search.douban.com/book/subject_search?search_text=%E4%B8%89%E4%BD%93&cat=1001&start=15", {
-        "credentials": "include",
+    const resp = await fetch(url, {
+        // "credentials": "include",
         "headers": {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -1599,7 +1599,7 @@ const search = async (key, page = 0) => {
             "Cache-Control": "no-cache",
             "Cookie": `bid=XhHqf-8EXHM; _pk_id.100001.2939=22000ec0640d1f52.1621258526.1.1621258538.1621258526.; _pk_ses.100001.2939=*; ap_v=0,6.0; __utma=30149280.1172275264.1621258527.1621258527.1621258527.1; __utmb=30149280.6.10.1621258527; __utmc=30149280; __utmz=30149280.1621258527.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); __yadk_uid=pPC74Y7x4ZUqCOZbiVbuNzFrNKcwEIMO; ll="118282"; dbcl2="238268017:0c1TqLWG/N0"; ck=Ngqb; push_noty_num=0; push_doumail_num=0; __gads=ID=9190ada87b975852-22b6e4b6afc80089:T=1621259433:S=ALNI_MZv6-V8HJoaWVRmXbuHeRXFn5JSSA; __utmt=1; __utmv=30149280.23826`
         },
-        "referrer": "https://search.douban.com/book/subject_search?search_text=%E4%B8%89%E4%BD%93&cat=1001&start=15",
+        "referrer": url,
         "method": "GET",
         "mode": "cors"
     });

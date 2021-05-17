@@ -11,7 +11,7 @@ import (
 	"sync"
 )
 
-type BookFinder struct {}
+type BookFinder struct{}
 
 func (bf *BookFinder) FindBook(r *http.Request, params *types.ReqMessage, rets *types.RetMessage) error {
 	if params.Type != "request" {
@@ -19,16 +19,15 @@ func (bf *BookFinder) FindBook(r *http.Request, params *types.ReqMessage, rets *
 	}
 	var wg sync.WaitGroup
 	wg.Add(len(args.Sites))
-	// blist 是一个 map，存储 书名—出现次数 键值对
-	blist := make(map[string]int)
 
-	for platform, _ := range(args.Sites) {
+	blist := make(map[string]int)
+	for platform, _ := range args.Sites {
 		go finder.FindBook(platform, params.Request, blist, &wg)
 	}
 	wg.Wait()
 
 	type nameCount struct {
-		bookName string
+		bookName  string
 		bookCount int
 	}
 	var rlist []nameCount
@@ -38,22 +37,24 @@ func (bf *BookFinder) FindBook(r *http.Request, params *types.ReqMessage, rets *
 			bookCount: count,
 		})
 	}
-
 	sort.Slice(rlist, func(i, j int) bool { return rlist[i].bookCount > rlist[j].bookCount })
 
-	var bookList []types.Book
+	booksChannel := make(chan types.Book)
 	i := 0
 	for _, _ = range rlist {
 		if i == params.Count {
 			break
 		}
-		bookList = append(bookList, types.Book{Title: rlist[i].bookName[3:len(rlist[i].bookName) - 3]})
-		bookList[i] = douban.DoubanSearch(bookList[i].Title)
+		go douban.DoubanSearch(rlist[i].bookName[3:len(rlist[i].bookName)-3], booksChannel)
 		i++
+	}
+	var booksList []types.Book
+	for j := 0; j < i; j++ {
+		booksList = append(booksList, <-booksChannel)
 	}
 	*rets = types.RetMessage{
 		Type:  "result",
-		Books: bookList,
+		Books: booksList,
 	}
 	return nil
 }

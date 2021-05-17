@@ -22,7 +22,7 @@ class SearchAPI(Resource):
             srcs = json.loads(srcs)
             if not isinstance(srcs, list):
                 raise ValueError
-        except (ValueError, json.decoder.JSONDecodeError):
+        except (TypeError, ValueError, json.decoder.JSONDecodeError):
             srcs = None
         if srcs is None:
             if src is None:
@@ -32,4 +32,6 @@ class SearchAPI(Resource):
         loop = asyncio.get_event_loop()
         resp = loop.run_until_complete(rpcs_search(key, page=page, srcs=srcs))
         # return make_result(data={'search': resp['result']['books']})
+        if resp is None:
+            return make_result(500, message='got null data')
         return make_result(data={'search': resp})
