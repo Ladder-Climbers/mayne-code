@@ -45,13 +45,14 @@ func (bf *BookFinder) FindBook(r *http.Request, params *types.ReqMessage, rets *
 		if i == params.Count {
 			break
 		}
-		go douban.DoubanSearch(rlist[i].bookName[3:len(rlist[i].bookName)-3], booksChannel)
+		go douban.DoubanSearch(rlist[i].bookName[3:len(rlist[i].bookName)-3], i, booksChannel)
 		i++
 	}
 	var booksList []types.Book
 	for j := 0; j < i; j++ {
 		booksList = append(booksList, <-booksChannel)
 	}
+	sort.Slice(booksList, func(i, j int) bool { return booksList[i].Ranking < booksList[j].Ranking })
 	*rets = types.RetMessage{
 		Type:  "result",
 		Books: booksList,

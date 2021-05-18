@@ -6,25 +6,26 @@ type WebArgs struct {
 }
 
 type Book struct {
-	Id int `json:"id"`
-	Title string `json:"title"`
-	URL string `json:"url"`
+	Ranking  int    `json:"-"`
+	Id       int    `json:"id"`
+	Title    string `json:"title"`
+	URL      string `json:"url"`
 	CoverURL string `json:"cover_url"`
 	Abstract string `json:"abstract"`
-	Rating struct{
+	Rating   struct {
 		StarCount float32 `json:"star_count"`
-		Value float32 `json:"value"`
+		Value     float32 `json:"value"`
 	} `json:"rating"`
 }
 
 type ReqMessage struct {
-	Type string `json:"type"`
-	Cmd int `json:"cmd"`
+	Type    string `json:"type"`
+	Cmd     int    `json:"cmd"`
 	Request string `json:"request"`
-	Count int `json:"count"`
+	Count   int    `json:"count"`
 }
 
 type RetMessage struct {
-	Type string `json:"type"`
+	Type  string `json:"type"`
 	Books []Book `json:"books"`
 }

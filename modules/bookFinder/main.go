@@ -25,7 +25,7 @@ func main() {
 	}
 	r := mux.NewRouter()
 	r.Handle(args.ServiceAPI, s)
-	err = http.ListenAndServe(":" + strconv.Itoa(args.ServicePort), r)
+	err = http.ListenAndServe(":"+strconv.Itoa(args.ServicePort), r)
 	if err != nil {
 		log.Fatal("Error(s) occurred while starting server.")
 	}

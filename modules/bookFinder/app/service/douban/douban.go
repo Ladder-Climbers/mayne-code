@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func DoubanSearch(bookName string, booksChannel chan types.Book) {
+func DoubanSearch(bookName string, ranking int, booksChannel chan types.Book) {
 	log.Println(bookName)
 	url := "http://localhost:" + strconv.Itoa(args.DoubPort) + args.DoubAPI
 	keyword := []string{bookName}
@@ -41,6 +41,7 @@ func DoubanSearch(bookName string, booksChannel chan types.Book) {
 			minDistance = nowDistance
 		}
 	}
+	simBook.Ranking = ranking
 	booksChannel <- simBook
 }
 
