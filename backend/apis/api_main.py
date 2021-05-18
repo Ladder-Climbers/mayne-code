@@ -28,15 +28,17 @@ class MainAPI(Resource):
 
 
 app = Flask(__name__)
-CORS(app)
 api = Api(app)
 api.add_resource(MainAPI, '/')
 api.add_resource(SearchAPI, '/search')
 api.add_resource(User, "/user")
 api.add_resource(UserUid, "/user/<int:uid>")
 api.add_resource(UserInfo, "/user_info")
+api.add_resource(Session, "/session")
 api.add_resource(Password, '/password')
 api.add_resource(Sync, '/sync')
+
+CORS(app)
 
 
 @app.after_request

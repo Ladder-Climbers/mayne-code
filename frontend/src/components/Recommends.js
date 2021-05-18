@@ -31,37 +31,37 @@ export default function Recomends() {
       title: "fangguojieryuan",
       author: "haha",
       desc: "a small book",
-      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
+      cover: "https://material-ui.com/static/images/grid-list/star.jpg"
     },
     {
       title: "fangguojieryuan2",
       author: "ha",
       desc: "a small book",
-      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
+      cover: "https://material-ui.com/static/images/grid-list/star.jpg"
     },
     {
       title: "fangguojieryuan",
       author: "ha",
       desc: "a small book",
-      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
+      cover: "https://material-ui.com/static/images/grid-list/star.jpg"
     },
     {
       title: "fangguojieryuan2",
       author: "ha",
       desc: "a small book",
-      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
+      cover: "https://material-ui.com/static/images/grid-list/star.jpg"
     },
     {
       title: "fangguojieryuan",
       author: "ha",
       desc: "a small book",
-      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
+      cover: "https://material-ui.com/static/images/grid-list/star.jpg"
     },
     {
       title: "fangguojieryuan2",
       author: "ha",
       desc: "a small book",
-      cover: "https://img3.doubanio.com/lpic/s24223015.jpg"
+      cover: "https://material-ui.com/static/images/grid-list/star.jpg"
     },
   ];
   const trigger = useScrollTrigger();

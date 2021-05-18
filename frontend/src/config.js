@@ -40,11 +40,9 @@ class Config {
         '默认主题',
         '黑暗模式'
       ],
-      auth: "",
+      api_token: {},
       // 用户信息
-      user: {
-        uid: '',
-      },
+      user: null,
       // 设置同步
       settings_async: true,
     };

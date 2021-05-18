@@ -1,7 +1,7 @@
 import { Box, Button, Container, Divider, TextField, Typography, Zoom, Fade } from '@material-ui/core';
 import React from 'react';
 import { api } from '../api/api';
-import { setUser } from '../data/action';
+import { setMessage, setUser } from '../data/action';
 import store from '../data/store';
 import { objectUpdate } from '../utils/utils';
 
@@ -32,10 +32,16 @@ function LoginFrame(props) {
       console.log('user', user.data.user);
       store.dispatch(setUser(user.data.user));
     } else {
+      // 注册，注册成功则跳转登录
       const res = await api.request('user', 'POST', {
         username: state.username, password: state.password
       });
       console.log(res);
+      if (res.code === 200) {
+        // 弹窗
+        store.dispatch(setMessage("注册成功"));
+        setState({actionType: 'login'});
+      }
     }
   }
 

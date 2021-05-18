@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { api } from './api/api';
 import { sleep } from './utils/utils';
 import reportWebVitals from './reportWebVitals';
+import { setUser } from './data/action';
 
 // 循环执行函数
 async function cycleFunc(cycle = 1000) {

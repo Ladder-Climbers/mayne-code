@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import Config from "../Config"
+import Config from "../config"
 
 const defaultState = {
   config: new Config(),

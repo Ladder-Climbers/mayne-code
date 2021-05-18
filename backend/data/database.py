@@ -1,4 +1,6 @@
 import time
+import traceback
+import os
 # from utils.logger import logger
 from data.tools import *
 
@@ -10,10 +12,10 @@ from sync.database import *
 class DataBase:
     # 用到的所有数据集合
     COLLECTIONS = [
-        'user', 'user_uid', 'gbk_bug', 'session', 'session_disabled_token', 'sync'
+        'user', 'user_uid', 'mayne_bug', 'session', 'session_disabled_token', 'sync'
     ]
 
-    def __init__(self):
+    def __init__(self, dismiss_rebase=False):
         self.client = None
         self.db = None
         self.user: UserDB = None
@@ -21,7 +23,7 @@ class DataBase:
         self.sync: SyncDB = None
         self.connect_init()
         self.init_parts()
-        if Constants.RUN_REBASE:
+        if Constants.RUN_REBASE and not dismiss_rebase:
             self.rebase()
 
     def init_parts(self):
@@ -30,8 +32,9 @@ class DataBase:
         self.sync = SyncDB(self.db)
 
     def rebase(self):
+        logger.warning('Rebasing...')
         for col in DataBase.COLLECTIONS:
-            logger.info(f'Dropping {col}')
+            # logger.info(f'Dropping {col}')
             self.db[col].drop()
         self.init_parts()
         uid = self.user.insert(Constants.USERS_DEFAULT)
@@ -45,7 +48,18 @@ class DataBase:
         self.db = self.client[Constants.DATABASE_NAME]
 
     def error_report(self, error):
-        self.db.gbk_bug.insert_one({'time': time.asctime(), 'error': error})
+        self.db.mayne_bug.insert_one({'time': time.asctime(), 'error': error})
 
 
-db = DataBase()
+# passed = False
+#
+# if passed is False:
+#     traceback.print_stack()
+#     passed = True
+
+# logger.warning(f'os.getenv("MAYNE_RUN_PID") = {os.getenv("MAYNE_RUN_PID")}')
+if os.getenv(Constants.DISMISS_REBASE) is None:
+    os.environ.setdefault(Constants.DISMISS_REBASE, f"{os.getpid()}")
+
+db = DataBase(dismiss_rebase=os.getenv(Constants.DISMISS_REBASE) == f"{os.getppid()}")
+# logger.warning(f'pid={os.getpid()}, ppid={os.getppid()}')

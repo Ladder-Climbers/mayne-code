@@ -57,15 +57,16 @@ class Constants:
     RUN_LISTENING = "0.0.0.0"
     RUN_PORT = int(os.environ.get("PORT", 8080))
     RUN_USE_RELOAD = False
-    # RUN_REBASE = True
-    RUN_REBASE = False
+    RUN_REBASE = True
+    # RUN_REBASE = False
     # Request API
     REQUEST_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0"
     # Modules
     MODULES_PATH = "../modules/"
     MODULES = {
         'DoubSearch': None,
-        "bookFinder": "go run main.go"
+        # "bookFinder": "go run main.go"
+        "bookFinder": None
     }
     # Search
     SEARCH_DEFAULT = "smart_search"
@@ -93,6 +94,8 @@ class Constants:
             'params_type': 'kwargs'
         }
     }
+    # Dismiss rebase for multiprocessing
+    DISMISS_REBASE = 'MAYNE_RUNNING_PID'
 
 
 class Statics:

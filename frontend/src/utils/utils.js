@@ -55,18 +55,18 @@ export function sleep(time_ms) {
   });
 }
 
-// 设置到本周的星期几
-Date.prototype.setDay = function (day) {
-  let day_ = this.getDay();
-  if (day_ === day) return this;
-  this.setTime(this.getTime() + 1000 * 60 * 60 * 24 * (day - day_));
-  return this;
-};
+// // 设置到本周的星期几
+// Date.prototype.setDay = function (day) {
+//   let day_ = this.getDay();
+//   if (day_ === day) return this;
+//   this.setTime(this.getTime() + 1000 * 60 * 60 * 24 * (day - day_));
+//   return this;
+// };
 
-// 获取 YYYY-MM-DD 格式
-Date.prototype.toDateString = function () {
-  return this.toISOString().slice(0, 10);
-};
+// // 获取 YYYY-MM-DD 格式
+// Date.prototype.toDateString = function () {
+//   return this.toISOString().slice(0, 10);
+// };
 
 // export function cutString(str, length=10)
 

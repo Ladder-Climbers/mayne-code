@@ -1,36 +1,60 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
-import store from './data/store';
-import {
-  // HashRouter as Router,
-  BrowserRouter as Router,
-  Switch,
-  Route
-} from "react-router-dom";
-import { ThemeProvider } from '@material-ui/styles';
+import "@fontsource/roboto";
 import clsx from 'clsx';
+import Container from '@material-ui/core/Container';
+import { makeStyles, useTheme, ThemeProvider } from '@material-ui/core/styles';
+import Drawer from '@material-ui/core/Drawer';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import List from '@material-ui/core/List';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider';
+import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import SearchIcon from '@material-ui/icons/Search';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import DashboardIcon from '@material-ui/icons/Dashboard';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+import LiveHelpIcon from '@material-ui/icons/LiveHelp';
 import GroupIcon from '@material-ui/icons/Group';
 import WebIcon from '@material-ui/icons/Web';
-import LiveHelpIcon from '@material-ui/icons/LiveHelp';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import DashboardIcon from '@material-ui/icons/Dashboard';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import SettingsIcon from '@material-ui/icons/Settings';
 import CloseIcon from '@material-ui/icons/Close';
 import StorageIcon from '@material-ui/icons/Storage';
-import { AppBar, CssBaseline, Divider, Drawer, IconButton, List, makeStyles, Toolbar, useTheme } from '@material-ui/core';
-import ListItemLink from './components/ListItemLink';
+import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
+import PhonelinkIcon from '@material-ui/icons/Phonelink';
+import {
+  HashRouter as Router,
+  // BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+import { Provider } from 'react-redux'
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+import store from './data/store';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListItem, Snackbar } from '@material-ui/core';
+import { setConfig, setErrorInfo, setMessage, setReserveTableData, setRoomStockData, setShopInfo } from "./data/action";
+
+import { isIterator, isMobileDevice, sleep } from "./utils/utils";
 
 import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
 import Library from "./pages/Library";
 import Services from "./pages/Services";
 import About from './pages/About';
 import Help from './pages/Help';
+import Settings from "./pages/Settings";
+import { api } from './api/api';
+import ListItemLink from './components/ListItemLink';
+import Search from './pages/Search';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -102,12 +126,44 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+let subscribers = {};
+
+let last_data = {
+  config: null,
+  user: null,
+  daemon: null
+};
+
+store.subscribe(async () => {
+  let state = store.getState();
+  // console.log('redux update to', state);
+  // 保存 config
+  if (state.config.data) {
+    if (JSON.stringify(state.config.data) != JSON.stringify(last_data.config)) {
+      // console.log('Config will change:', state.config.data);
+      state.config.save();
+      if (store.getState().user && store.getState().config.data.settings_async) {
+        await api.request('sync', 'POST', { config: state.config.data });
+      }
+    } else {
+      // console.log('Not change:', state.config.data);
+    }
+    last_data.config = state.config.data;
+  }
+  for (let subFunc in subscribers) {
+    subscribers[subFunc](state);
+  }
+});
+
 function App() {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const titleDefault = "Mayne的大图书馆";
+  const [errorDialogInfo, setErrorDialogInfo] = React.useState(false);
+  const [myMessage, setMyMessage] = React.useState(null);
   const [title, setTitle] = React.useState(titleDefault);
+  const [ignored, forceUpdate] = React.useReducer(x => x + 1, 0);
   // 拉大到800会打开，拉小到600关闭
   const triggerWidthOpen = 800;
   const triggerWidthClose = 600;
@@ -128,104 +184,181 @@ function App() {
     };
   });
 
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  const handleClickAction = () => {
-    if (window.innerWidth < 600) {
-      setOpen(false);
+  // 注册一个当遇到错误的时候调用的钩子吧，用来显示错误信息
+  subscribers['Error'] = function (state) {
+    if (state.errorInfo) {
+      console.log('Error Hook: ', state.errorInfo);
+      setErrorDialogInfo(state.errorInfo);
+      // 清空错误信息
+      store.dispatch(setErrorInfo(null));
     }
   };
+  // 注册一个消息钩子
+  subscribers['Message'] = function (state) {
+    if (state.message) {
+      console.log('message: ', state.message);
+      setMyMessage(state.message);
+      store.dispatch(setMessage(null));
+    }
+  };
+  subscribers['User'] = function (state) {
+    if (state.user) {
+      if (JSON.stringify(state.user) != JSON.stringify(last_data.user)) {
+        forceUpdate();
+      }
+      last_data.user = state.user;
+    }
+  };
+  subscribers['Daemon'] = function (state) {
+    if (state.daemon) {
+      if (JSON.stringify(state.daemon) != JSON.stringify(last_data.daemon)) {
+        forceUpdate();
+      }
+      last_data.daemon = state.daemon;
+    }
+  };
+
+  let routerContent = <Router>
+    <CssBaseline />
+    <AppBar
+      position="fixed"
+      className={clsx(classes.appBar, {
+        [classes.appBarShift]: open,
+      })}
+    >
+      <Toolbar>
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          onClick={() => { setOpen(true); }}
+          edge="start"
+          className={clsx(classes.menuButton, {
+            [classes.hide]: open,
+          })}
+        >
+          <MenuIcon />
+        </IconButton>
+        <Typography variant="h6" noWrap className={classes.title}>
+          {title}
+        </Typography>
+        <IconButton
+          color="inherit"
+          aria-label="login"
+          onClick={() => { }}
+        >
+          <AccountCircleIcon />
+        </IconButton>
+      </Toolbar>
+    </AppBar>
+    <Drawer
+      variant="permanent"
+      className={clsx(classes.drawer, {
+        [classes.drawerOpen]: open,
+        [classes.drawerClose]: !open,
+      })}
+      classes={{
+        paper: clsx({
+          [classes.drawerOpen]: open,
+          [classes.drawerClose]: !open,
+        }),
+      }}
+    >
+      <div className={classes.toolbar}>
+        <IconButton onClick={() => { setOpen(false); }}>
+          {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronLeftIcon />}
+        </IconButton>
+      </div>
+      <Divider />
+      <List onClick={() => {
+        if (window.innerWidth < 600) {
+          setOpen(false);
+        }
+      }}>
+        <ListItemLink to="/" primary="启动页" icon={<DashboardIcon />} />
+        <ListItemLink to="/search" primary="找书" icon={<SearchIcon />} />
+        <ListItemLink to="/library" primary="馆藏" icon={<LibraryBooksIcon />} />
+        <ListItemLink to="/services" primary="服务" icon={<WebIcon />} />
+        <ListItemLink to="/settings" primary="设置" icon={<SettingsIcon />} />
+        <ListItemLink to="/help" primary="帮助" icon={<LiveHelpIcon />} />
+        <ListItemLink to="/about" primary="关于" icon={<GroupIcon />} />
+      </List>
+    </Drawer>
+    <main className={classes.content}>
+      <div className={classes.toolbar} />
+      <Switch>
+        <Route path={"/"} exact={true}>
+          <Dashboard></Dashboard>
+        </Route>
+        <Route path={"/library"} exact={true}>
+          <Library></Library>
+        </Route>
+        <Route path={"/search"} exact={true}>
+          <Search></Search>
+        </Route>
+        <Route path={"/settings"} exact={false}>
+          <Settings />
+        </Route>
+        <Route path={"/services"} exact={true}>
+          <Services></Services>
+        </Route>
+        <Route path={"/help"} exact={true}>
+          <Help></Help>
+        </Route>
+        <Route path={"/about"} exact={true}>
+          <About></About>
+        </Route>
+      </Switch>
+    </main>
+  </Router>;
+
+  if (!store.getState().user) routerContent = <Login></Login>
 
   return (
     <div className={classes.root}>
       <ThemeProvider theme={store.getState().config.theme}>
-        <Router>
-          <CssBaseline />
-          <AppBar
-            position="fixed"
-            className={clsx(classes.appBar, {
-              [classes.appBarShift]: open,
-            })}
-          >
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                className={clsx(classes.menuButton, {
-                  [classes.hide]: open,
-                })}
-              >
-                <MenuIcon />
+        {routerContent}
+        <Dialog open={errorDialogInfo ? true : false} onClose={() => { setErrorDialogInfo(null); }}>
+          <DialogTitle>遇到错误</DialogTitle>
+          <DialogContent>
+            <Typography variant="body1">错误信息</Typography>
+            <Box component="div">
+              <Box component="div">
+                {() => {
+                  if (isIterator(errorDialogInfo) && typeof (errorDialogInfo) !== 'string') {
+                    return <List>
+                      {errorDialogInfo.map((d, i) => <ListItem key={i}>
+                        <code>{JSON.stringify(d) === '{}' ? d.toString() : JSON.stringify(d)}</code>
+                      </ListItem>)}
+                    </List>;
+                  } else {
+                    return <code>{JSON.stringify(errorDialogInfo) === '{}' ? errorDialogInfo.toString() : JSON.stringify(errorDialogInfo)}</code>;
+                  }
+                }}
+              </Box>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button color="primary" onClick={() => { window.location.reload() }}>刷新</Button>
+            <Button color="primary" onClick={() => { setErrorDialogInfo(null); }}>取消</Button>
+          </DialogActions>
+        </Dialog>
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          open={myMessage !== null}
+          autoHideDuration={6000}
+          // onClose={(e) => { console.log(e); }}
+          message={myMessage}
+          action={
+            <React.Fragment>
+              <IconButton size="small" aria-label="close" color="inherit" onClick={() => setMyMessage(null)}>
+                <CloseIcon fontSize="small" />
               </IconButton>
-              <Typography variant="h6" noWrap className={classes.title}>
-                {title}
-              </Typography>
-              <IconButton
-                color="inherit"
-                aria-label="login"
-                onClick={() => { }}
-              >
-                <AccountCircleIcon />
-              </IconButton>
-            </Toolbar>
-          </AppBar>
-          <Drawer
-            variant="permanent"
-            className={clsx(classes.drawer, {
-              [classes.drawerOpen]: open,
-              [classes.drawerClose]: !open,
-            })}
-            classes={{
-              paper: clsx({
-                [classes.drawerOpen]: open,
-                [classes.drawerClose]: !open,
-              }),
-            }}
-          >
-            <div className={classes.toolbar}>
-              <IconButton onClick={handleDrawerClose}>
-                {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronLeftIcon />}
-              </IconButton>
-            </div>
-            <Divider />
-            <List onClick={handleClickAction}>
-              <ListItemLink to="/" primary="启动页" icon={<DashboardIcon />} />
-              <ListItemLink to="/library" primary="馆藏" icon={<LibraryBooksIcon />} />
-              <ListItemLink to="/services" primary="服务" icon={<WebIcon />} />
-              <ListItemLink to="/help" primary="帮助" icon={<LiveHelpIcon />} />
-              <ListItemLink to="/about" primary="关于" icon={<GroupIcon />} />
-            </List>
-          </Drawer>
-          <main className={classes.content}>
-            <div className={classes.toolbar} />
-            <Switch>
-              <Route path={"/"} exact={true}>
-                <Dashboard></Dashboard>
-              </Route>
-              <Route path={"/library"} exact={true}>
-                <Library></Library>
-              </Route>
-              <Route path={"/services"} exact={true}>
-                <Services></Services>
-              </Route>
-              <Route path={"/help"} exact={true}>
-                <Help></Help>
-              </Route>
-              <Route path={"/about"} exact={true}>
-                <About></About>
-              </Route>
-            </Switch>
-          </main>
-        </Router>
+            </React.Fragment>
+          }
+        />
       </ThemeProvider>
     </div>);
 }
