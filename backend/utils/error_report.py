@@ -14,7 +14,7 @@ def send_report(report):
                    password=Constants.EMAIL_SMTP_PASSWORD,
                    text=str(report),
                    title_from=Constants.EMAIL_ERROR_TITLE,
-                   title_to=f'Dear {Constants.OWNER}',
+                   title_to=f'Dear {Constants.ADMIN}',
                    subject=f"gbk v{Constants.VERSION}的新bug report")
     except Exception as e:
         logger.error('错误信息邮件发送失败！ %s' % e)

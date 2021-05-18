@@ -10,7 +10,7 @@ from pytz import utc
 class Constants:
     # Version info
     VERSION = "0.2.0"
-    OWNER = "Chiro"
+    ADMIN = "chiro"
     EMAIL = "Chiro2001@163.com"
     # Find
     # FIND_LIMIT = 30
@@ -37,17 +37,17 @@ class Constants:
     EMAIL_SMTP_SSL = 'smtp.163.com'
     EMAIL_SMTP_PORT = 465
     # Users
-    USERS_OWNER_PASSWORD = secrets.SECRET_OWNER_PASSWORD
-    USERS_OWNER_USERNAME = 'chiro'
-    USERS_OWNER_NICK = 'Chiro'
-    USERS_OWNER_GITHUB = 'chiro2001'
-    USERS_OWNER = {
-        'username': USERS_OWNER_USERNAME,
-        'nick': USERS_OWNER_NICK,
+    USERS_DEFAULT_PASSWORD = secrets.SECRET_OWNER_PASSWORD
+    USERS_DEFAULT_USERNAME = 'chiro'
+    USERS_DEFAULT_NICK = 'Chiro'
+    USERS_DEFAULT_GITHUB = 'chiro2001'
+    USERS_DEFAULT = {
+        'username': USERS_DEFAULT_USERNAME,
+        'nick': USERS_DEFAULT_NICK,
         'state': 'normal',
         'profile': {
             'contact': {
-                'github': USERS_OWNER_GITHUB
+                'github': USERS_DEFAULT_GITHUB
             }
         }
     }

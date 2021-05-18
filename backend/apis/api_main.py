@@ -2,9 +2,13 @@ import json
 from flask import Flask, Response
 from flask_cors import CORS
 from flask_restful import Resource, Api
-from utils.logger import logger
+
 from utils.docs import get_class_docs
 from search.api import SearchAPI
+
+from user.api import *
+from session.api import *
+from sync.api import *
 
 
 class MainAPI(Resource):
@@ -28,6 +32,11 @@ CORS(app)
 api = Api(app)
 api.add_resource(MainAPI, '/')
 api.add_resource(SearchAPI, '/search')
+api.add_resource(User, "/user")
+api.add_resource(UserUid, "/user/<int:uid>")
+api.add_resource(UserInfo, "/user_info")
+api.add_resource(Password, '/password')
+api.add_resource(Sync, '/sync')
 
 
 @app.after_request
