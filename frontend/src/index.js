@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 import { api } from './api/api';
 import { sleep } from './utils/utils';
 import reportWebVitals from './reportWebVitals';
-import { setUser } from './data/action';
+import { setConfig, setErrorInfo, setUser } from './data/action';
 
 // 循环执行函数
 async function cycleFunc(cycle = 1000) {
@@ -33,17 +33,6 @@ async function startFunc() {
         store.dispatch(setUser(res.data.user));
       }
     }
-    // const daemon = await api.request('remote_login', 'GET');
-    // if (daemon.code === 200 && daemon.data.uid) {
-    //   store.dispatch(setDaemon(daemon.data));
-    // } else store.dispatch(setDaemon(null));
-    // let c = api.download_config();
-    // if (!c.settings_async) return;
-    // const config_frontend = await api.download_config();
-    // if (!config_frontend) {
-    //   store.dispatch(setErrorInfo("同步设置失败"));
-    // }
-    // else store.dispatch(setConfig(config_frontend));
   }, 0);
 }
 

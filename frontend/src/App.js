@@ -311,7 +311,13 @@ function App() {
     </main>
   </Router>;
 
-  if (!store.getState().user) routerContent = <Login></Login>
+  if (!store.getState().user) {
+    if (store.getState().config.data.api_token.access_token) {
+      routerContent = <Typography variant="body1">正在登录...</Typography>
+    } else {
+      routerContent = <Login></Login>
+    }
+  }
 
   return (
     <div className={classes.root}>
