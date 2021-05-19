@@ -66,7 +66,7 @@ class API {
     };
     // console.log('request', router, method, data, payload);
     const url = (method !== 'GET' || !data) ? `${this.url}/${router}` : `${this.url}/${router}?${urlEncode(data).slice(1)}`;
-    console.log('url', url);
+    // console.log('url', url);
     const resp = await fetch(url, payload);
     let js = null;
     try { js = await resp.json(); } catch (e) {
