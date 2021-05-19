@@ -2,9 +2,12 @@ from utils.api_tools import *
 
 
 class User(Resource):
+    """
+    用户部分
+    """
     args_signin = reqparse.RequestParser() \
-        .add_argument("username", type=str, required=True, location=["json", ]) \
-        .add_argument("password", type=str, required=True, location=["json", ])
+        .add_argument("username", type=str, help="用户名", required=True, location=["json", ]) \
+        .add_argument("password", type=str, help="密码", required=True, location=["json", ])
 
     # 此处可能并非线程安全...使用的 args_signin 是静态变量
     # 但是parser使用的是全局request，所以应该安全
@@ -12,9 +15,6 @@ class User(Resource):
     def post(self):
         """
         注册
-        :json username: 用户名
-        :json password: 密码
-        :return:
         """
         args = self.args_signin.parse_args()
         username, password = args.get('username'), args.get('password')
@@ -32,7 +32,7 @@ class User(Resource):
                 'state': 'normal',
                 'profile': {}
             })
-        except gbk_exceptions.GBKUserExist:
+        except exceptions.MayneUserExist:
             return make_result(400, message='用户已存在')
         db.session.insert(uid, password)
         return make_result(data={'uid': uid})
@@ -41,8 +41,6 @@ class User(Resource):
     def get(self, uid: int):
         """
         获取用户信息
-        :param uid: uid
-        :return:
         """
         user = db.user.get_by_uid(uid)
         return make_result(data={'user': user})
@@ -51,8 +49,6 @@ class User(Resource):
     def delete(self, uid: int):
         """
         删除自己用户
-        :param uid: uid
-        :return:
         """
         db.user.delete_user(uid)
         return make_result()
@@ -63,8 +59,6 @@ class UserInfo(Resource):
     def post(self, uid: int):
         """
         更新用户信息
-        :param uid: uid
-        :return:
         """
         user = reqparse.RequestParser().parse_args()
         user['uid'] = uid
@@ -78,8 +72,6 @@ class UserUid(Resource):
     def get(self, uid: int):
         """
         获取 uid 对应用户信息
-        :param uid: uid
-        :return:
         """
         user = db.user.get_by_uid(uid)
         return make_result(data={'user': user})

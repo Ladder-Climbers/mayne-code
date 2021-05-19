@@ -13,16 +13,16 @@ class RPCTarget:
 
     async def call(self, method: str, params: list, id_: int = 1):
         url = self.url()
-        logger.warning(f'url {url}')
+        # logger.warning(f'url {url}')
         payload = {
             "method": method,
             "params": params,
             "jsonrpc": '2.0',
             "id": id_
         }
-        logger.warning(f'payload: {payload}')
+        # logger.warning(f'payload: {payload}')
         response = requests.post(url, json=payload).json()
-        logger.warning(f'response {response}')
+        # logger.warning(f'response {response}')
         if 'result' in response:
             response = response['result']
         return response

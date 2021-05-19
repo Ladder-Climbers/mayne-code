@@ -12,6 +12,7 @@
     "@material-ui/pickers": "^3.3.10",
     "cra-template": "1.1.2",
     "date-fns": "^2.0.0",
+    "history": "^5.0.0",
     "moment": "^2.29.1",
     "qrcode.react": "^1.0.1",
     "react": "^17.0.2",

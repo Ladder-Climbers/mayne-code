@@ -18,13 +18,9 @@ class MainAPI(Resource):
 
     def get(self):
         """
-        文档：get
-        :return:
+        获取各个API的文档
         """
-        return {
-            'code': 200,
-            'document': get_class_docs(self)
-        }
+        return make_result(data={'document': {endpoint: get_class_docs(resources[endpoint]) for endpoint in resources}})
 
 
 class DropData(Resource):
@@ -33,17 +29,31 @@ class DropData(Resource):
         return make_result()
 
 
+resources = {}
+
+
+def add_resource(class_type: Resource, endpoint: str):
+    global resources
+    resources[endpoint] = class_type
+
+
+def apply_resource():
+    for endpoint in resources:
+        api.add_resource(resources[endpoint], endpoint)
+
+
 app = Flask(__name__)
 api = Api(app)
-api.add_resource(MainAPI, '/')
-api.add_resource(SearchAPI, '/search')
-api.add_resource(User, "/user")
-api.add_resource(UserUid, "/user/<int:uid>")
-api.add_resource(UserInfo, "/user_info")
-api.add_resource(Session, "/session")
-api.add_resource(Password, '/password')
-api.add_resource(Sync, '/sync')
-api.add_resource(DropData, '/drop_data')
+add_resource(MainAPI, '/')
+add_resource(SearchAPI, '/search')
+add_resource(User, "/user")
+add_resource(UserUid, "/user/<int:uid>")
+add_resource(UserInfo, "/user_info")
+add_resource(Session, "/session")
+add_resource(Password, '/password')
+add_resource(Sync, '/sync')
+add_resource(DropData, '/drop_data')
+apply_resource()
 
 CORS(app)
 
@@ -59,6 +69,7 @@ def api_after(res: Response):
                 logger.warning(f'response: {js}')
         except Exception as e:
             logger.error(e)
+            logger.error(f'data: {res.data}')
         # print(res.data)
     return res
 

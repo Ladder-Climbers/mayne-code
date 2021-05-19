@@ -6,11 +6,16 @@ import SearchBox from '../components/SearchBox';
 import PopularAuthors from '../components/PopularAuthors';
 import PopularTags from '../components/PopularTags';
 import Slides from '../components/Slides';
+import history from "../utils/history";
+import { urlEncode } from '../utils/utils';
 export default function Dashboard(props) {
   return (<Container>
     <Box>
       <Box style={{ paddingLeft: 40, paddingRight: 40 }}>
-        <SearchBox></SearchBox>
+        <SearchBox onSearch={(key, src) => {
+          history.push({ pathname: "/search", search: urlEncode({ key, src }).slice(1) });
+          // history.push({ pathname: "/search", params: { key, src } });
+        }}></SearchBox>
       </Box>
     </Box>
     <br />

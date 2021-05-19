@@ -14,7 +14,7 @@ class UserDB(BaseDB):
     def insert(self, user: dict) -> int:
         user_data = self.find_by_username(user.get('username'))
         if user_data is not None:
-            raise exceptions.GBKUserExist
+            raise exceptions.MayneUserExist
         uid = self.get_next_uid()
         user['uid'] = uid
         auto_time_update(self.col, {'username': user.get('username')}, user)

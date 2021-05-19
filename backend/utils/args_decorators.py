@@ -18,6 +18,7 @@ def args_required_method(parser):
             return fn(*args, **kwargs)
 
         wrapper.__inner__ = fn
+        wrapper.__args_parser__ = parser
         return wrapper
 
     return decorator

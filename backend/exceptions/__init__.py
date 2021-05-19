@@ -1,7 +1,7 @@
 from utils.logger import logger
 
 
-class GBKBaseError(Exception):
+class MayneBaseError(Exception):
     def __init__(self, data: str = None):
         self.data = data
         logger.error(self.__str__())
@@ -10,25 +10,25 @@ class GBKBaseError(Exception):
         return f"Error: {self.__class__.__name__}{(' : %s' % self.data) if self.data is not None else ''}"
 
 
-class GBKUserExist(GBKBaseError):
+class MayneUserExist(MayneBaseError):
     pass
 
 
-class GBKPermissionError(GBKBaseError):
+class MaynePermissionError(MayneBaseError):
     pass
 
 
-class GBKLoginError(GBKBaseError):
+class MayneLoginError(MayneBaseError):
     pass
 
 
-class GBKShopIdError(GBKBaseError):
+class MayneShopIdError(MayneBaseError):
     pass
 
 
-class GBKError(GBKBaseError):
+class MayneError(MayneBaseError):
     pass
 
 
-class GBKCookiesError(GBKBaseError):
+class MayneCookiesError(MayneBaseError):
     pass

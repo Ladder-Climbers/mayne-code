@@ -17,14 +17,10 @@ if (!store.getState().searchInfo && !requestingSearchInfo) {
 
 
 export default function SearchBox(props) {
-  const { onSearch } = props;
+  const { onSearch, defaultValue } = props;
   const searchInfo = store.getState().searchInfo;
-  const [searchValue, setSearchValue] = React.useState('');
-  // const searchTypeList = [
-  //   '全部', '百度学术'
-  // ];
-  // const [searchType, setSearchType] = React.useState(searchTypeList[0]);
-  const [searchType, setSearchType] = React.useState(searchInfo ? Object.keys(searchInfo)[0] : null);
+  const [searchValue, setSearchValue] = React.useState(defaultValue ? (defaultValue.key ? defaultValue.key : '') : '');
+  const [searchType, setSearchType] = React.useState(searchInfo ? (defaultValue ? defaultValue.src : Object.keys(searchInfo)[0]) : null);
   const handleSearch = () => {
     if (!onSearch) return;
     onSearch(searchValue, searchType, searchInfo);

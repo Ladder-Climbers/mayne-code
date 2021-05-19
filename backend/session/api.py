@@ -2,17 +2,19 @@ from utils.api_tools import *
 
 
 class Session(Resource):
+    """
+    用户活动认证相关
+    """
     args_login = reqparse.RequestParser() \
-        .add_argument("username", type=str, required=True, location=["json", ]) \
-        .add_argument("password", type=str, required=True, location=["json", ])
+        .add_argument("username", help="用户名", type=str, required=True, location=["json", ]) \
+        .add_argument("password", help="密码", type=str, required=True, location=["json", ])
     args_update = reqparse.RequestParser() \
-        .add_argument("Refresh", type=str, required=True, location=Constants.JWT_LOCATIONS)
+        .add_argument("Refresh", help="refresh_token", type=str, required=True, location=Constants.JWT_LOCATIONS)
 
     @args_required_method(args_login)
     def post(self):
         """
         登录
-        :return:
         """
         args = self.args_login.parse_args()
         username, password = args.get('username'), args.get('password')
@@ -33,7 +35,6 @@ class Session(Resource):
     def get(self):
         """
         更新 access_token
-        :return:
         """
         refresh_token = self.args_update.parse_args(http_error_code=401).get('Refresh')
         try:
@@ -59,7 +60,6 @@ class Session(Resource):
     def delete(self, access_token: str):
         """
         注销
-        :return:
         """
         # logger.warning('access_token: ' + access_token)
         refresh_token = self.args_update.parse_args(http_error_code=401).get('Refresh')
@@ -75,13 +75,18 @@ class Session(Resource):
 
 
 class Password(Resource):
-    # 更新密码
+    """
+    密码操作
+    """
     args_update_password = reqparse.RequestParser() \
-        .add_argument("password")
+        .add_argument("password", help="新密码", type=str, required=True, location=["json", ])
 
     @args_required_method(args_update_password)
     @auth_required_method
     def post(self, uid: int):
+        """
+        密码更新
+        """
         password = self.args_update_password.parse_args().get('password')
         if not db.session.update_one({'uid': uid, 'password': password}):
             return make_result(400)

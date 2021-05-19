@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
   media: {
     // height: 0,
     // paddingTop: '56.25%', // 16:9
-    paddingTop: '100%', // 16:9
+    paddingTop: '100%'
   },
   expand: {
     transform: 'rotate(0deg)',
@@ -59,7 +59,8 @@ export default function BookItem(props) {
         e.stopPropagation();
         console.log('to visit title:', book.title);
       }}
-    />
+    >
+    </CardMedia>
     {/* <CardContent>
       
     </CardContent> */}

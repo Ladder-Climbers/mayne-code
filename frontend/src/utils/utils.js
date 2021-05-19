@@ -37,6 +37,10 @@ export function urlEncode2(obj) {
   }
 }
 
+export function getHashedQuery() {
+  return [...new URL('http://localhost' + window.location.hash.slice(1)).searchParams];
+}
+
 export function parseTimePoint(time) {
   return moment(time).format('LLLL');
 }
