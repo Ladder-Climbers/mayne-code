@@ -140,7 +140,7 @@ store.subscribe(async () => {
   // 保存 config
   if (state.config.data) {
     if (JSON.stringify(state.config.data) != JSON.stringify(last_data.config)) {
-      // console.log('Config will change:', state.config.data);
+      console.log('Config will change:', state.config.data);
       state.config.save();
       if (store.getState().user && store.getState().config.data.settings_async) {
         await api.request('sync', 'POST', { config: state.config.data });

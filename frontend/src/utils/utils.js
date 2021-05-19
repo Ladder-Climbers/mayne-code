@@ -125,3 +125,19 @@ export function isChinese(temp) {
   if (re.test(temp)) return false;
   return true;
 }
+
+export function getRandomInt(start, stop) {
+  return Math.floor(Math.random() * (stop - start)) + start;
+}
+
+export function shuffle(arr) {
+  let _arr = arr.slice();
+  //slice不会影响原来的数组，但是splice就会影响原来的arr数组
+  for (let i = 0; i < _arr.length; i++) {
+    let j = getRandomInt(0, i);
+    let t = _arr[i];
+    _arr[i] = _arr[j];
+    _arr[j] = t;
+  }
+  return _arr;
+}

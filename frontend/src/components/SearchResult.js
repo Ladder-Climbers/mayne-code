@@ -6,7 +6,7 @@ function SmartSearchResult(props) {
   const { books } = props;
   // console.log('books', books);
   return <Grid container spacing={3}>
-    {books.map((book, k) => <Grid key={k} item xs={6} sm={4} lg={3}><BookItem book={{
+    {books.map((book, k) => <Grid key={k} item xs={12} sm={6} lg={3}><BookItem book={{
       title: book.title,
       author: book.abstract,
       desc: null,
@@ -18,7 +18,7 @@ function SmartSearchResult(props) {
 function DoubanResult(props) {
   const { books } = props;
   return <Grid container spacing={3}>
-    {books.map((book, k) => <Grid key={k} item xs={6} sm={4} lg={3}><BookItem book={{
+    {books.map((book, k) => <Grid key={k} item xs={12} sm={6} lg={3}><BookItem book={{
       title: book.title,
       author: book.abstract,
       desc: null,

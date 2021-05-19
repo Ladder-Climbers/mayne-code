@@ -6,3 +6,4 @@ colorlog
 pymongo
 flask-restful
 itsdangerous
+bs4

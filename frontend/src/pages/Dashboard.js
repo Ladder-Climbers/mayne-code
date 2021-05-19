@@ -13,7 +13,7 @@ export default function Dashboard(props) {
     <Box>
       <Box style={{ paddingLeft: 40, paddingRight: 40 }}>
         <SearchBox onSearch={(key, src) => {
-          history.push({ pathname: "/search", search: urlEncode({ key, src }).slice(1) });
+          history.push({ pathname: "/search", search: '?' + urlEncode({ key, src }).slice(1) });
           // history.push({ pathname: "/search", params: { key, src } });
         }}></SearchBox>
       </Box>

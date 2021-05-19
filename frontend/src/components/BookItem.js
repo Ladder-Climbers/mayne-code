@@ -53,7 +53,7 @@ export default function BookItem(props) {
     /> */}
     <CardMedia
       className={classes.media}
-      image={book.cover}
+      image={book.cover ? book.cover : "https://img2.doubanio.com/view/subject/m/public/s19120153.jpg"}
       title={book.title}
       onClick={(e) => {
         e.stopPropagation();

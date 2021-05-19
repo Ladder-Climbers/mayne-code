@@ -9,6 +9,7 @@ from search.api import SearchAPI
 from user.api import *
 from session.api import *
 from sync.api import *
+from recommends.api import *
 
 
 class MainAPI(Resource):
@@ -53,6 +54,7 @@ add_resource(Session, "/session")
 add_resource(Password, '/password')
 add_resource(Sync, '/sync')
 add_resource(DropData, '/drop_data')
+add_resource(DoubanTopAPI, '/douban_top')
 apply_resource()
 
 CORS(app)
