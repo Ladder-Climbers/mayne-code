@@ -6,8 +6,9 @@ import { isIterator, urlEncode } from "../utils/utils"
 
 class API {
   constructor() {
-    this.host = '127.0.0.1';
+    // this.host = '127.0.0.1';
     // this.host = null;
+    this.host = window.location.href.includes("localhost") ? "localhost" : null;
     this.port = 8080;
     this.api_version = "v1";
     this.api_prefix = `/api/${this.api_version}`;
