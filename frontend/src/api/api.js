@@ -59,12 +59,15 @@ class API {
     const payload = {
       method: method,
       mode: 'cors',
-      body: data ? JSON.stringify(data) : undefined,
+      // GET Body 不带数据
+      body: method === 'GET' ? undefined : (data ? JSON.stringify(data) : undefined),
       // 注销的时候自带 refresh_token
       headers: this.get_headers(Boolean(router === 'session' && method === 'DELETE')),
     };
     // console.log('request', router, method, data, payload);
-    const resp = await fetch(`${this.url}/${router}`, payload);
+    const url = (method !== 'GET' || !data) ? `${this.url}/${router}` : `${this.url}/${router}?${urlEncode(data).slice(1)}`;
+    console.log('url', url);
+    const resp = await fetch(url, payload);
     let js = null;
     try { js = await resp.json(); } catch (e) {
       console.error(e);

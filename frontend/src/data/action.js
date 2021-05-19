@@ -34,3 +34,9 @@ export function setMessage(data) {
   };
 }
 
+export function setSearchInfo(data) {
+  return dispatch => {
+    dispatch({ type: "SET_SEARCH_INFO", data: data });
+  };
+}
+

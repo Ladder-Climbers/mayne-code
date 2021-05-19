@@ -74,24 +74,29 @@ class Constants:
         'smart_search': {
             'type': 'rpc',
             'params_type': 'rpc_smart_search',
-            'call_name': 'BookFinder.FindBook'
+            'call_name': 'BookFinder.FindBook',
+            'name': '智能搜索'
         },
         'bing': {
             'type': 'function',
-            'params_type': 'kwargs'
+            'params_type': 'kwargs',
+            'name': 'bing搜索'
         },
         'douban': {
             'type': 'rpc',
             'params_type': "rpc",
-            'call_name': 'search'
+            'call_name': 'search',
+            'name': '豆瓣搜索'
         },
         'szdnet': {
             'type': 'function',
-            'params_type': 'kwargs'
+            'params_type': 'kwargs',
+            'name': '深圳文献港搜索'
         },
         'local_database': {
             'type': 'database',
-            'params_type': 'kwargs'
+            'params_type': 'kwargs',
+            'name': '自有数据库搜索'
         }
     }
     # Dismiss rebase for multiprocessing

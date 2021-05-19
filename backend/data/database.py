@@ -51,15 +51,9 @@ class DataBase:
         self.db.mayne_bug.insert_one({'time': time.asctime(), 'error': error})
 
 
-# passed = False
-#
-# if passed is False:
-#     traceback.print_stack()
-#     passed = True
-
-# logger.warning(f'os.getenv("MAYNE_RUN_PID") = {os.getenv("MAYNE_RUN_PID")}')
+# 由主进程启动的进程不重新初始化数据库
 if os.getenv(Constants.DISMISS_REBASE) is None:
     os.environ.setdefault(Constants.DISMISS_REBASE, f"{os.getpid()}")
 
 db = DataBase(dismiss_rebase=os.getenv(Constants.DISMISS_REBASE) == f"{os.getppid()}")
-# logger.warning(f'pid={os.getpid()}, ppid={os.getppid()}')
+

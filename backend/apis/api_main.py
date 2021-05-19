@@ -27,6 +27,12 @@ class MainAPI(Resource):
         }
 
 
+class DropData(Resource):
+    def get(self):
+        db.rebase()
+        return make_result()
+
+
 app = Flask(__name__)
 api = Api(app)
 api.add_resource(MainAPI, '/')
@@ -37,6 +43,7 @@ api.add_resource(UserInfo, "/user_info")
 api.add_resource(Session, "/session")
 api.add_resource(Password, '/password')
 api.add_resource(Sync, '/sync')
+api.add_resource(DropData, '/drop_data')
 
 CORS(app)
 

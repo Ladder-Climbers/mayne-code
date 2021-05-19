@@ -1,14 +1,18 @@
 import React from 'react';
-import { Button, Container, Divider, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@material-ui/core";
+import { Box, Button, Container, Divider, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@material-ui/core";
 import Recomends from "../components/Recommends";
 import { api } from "../api/api";
 import SearchBox from '../components/SearchBox';
 import PopularAuthors from '../components/PopularAuthors';
 import PopularTags from '../components/PopularTags';
 import Slides from '../components/Slides';
-export default function Dashboard() {
+export default function Dashboard(props) {
   return (<Container>
-    <SearchBox></SearchBox>
+    <Box>
+      <Box style={{ paddingLeft: 40, paddingRight: 40 }}>
+        <SearchBox></SearchBox>
+      </Box>
+    </Box>
     <br />
     <Divider></Divider>
     <Slides></Slides>

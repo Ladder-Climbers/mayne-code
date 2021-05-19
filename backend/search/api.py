@@ -13,6 +13,9 @@ class SearchAPI(Resource):
 
     @args_required_method(args_search)
     def get(self):
+        """
+        搜索功能
+        """
         args = self.args_search.parse_args()
         key: str = args.get('key')
         page: int = args.get('page', 0)
@@ -35,3 +38,9 @@ class SearchAPI(Resource):
         if resp is None:
             return make_result(500, message='got null data')
         return make_result(data={'search': resp})
+
+    def patch(self):
+        """
+        获取搜索信息
+        """
+        return make_result(data={'search_info': Constants.SEARCH_SRC})

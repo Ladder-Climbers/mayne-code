@@ -91,7 +91,7 @@ export function funDownload(content, filename) {
 
 
 export function deepCopy(data) {
-  if (isIterator(data) && typeof(data) !== "string") {
+  if (isIterator(data) && typeof (data) !== "string") {
     let d = [];
     for (let i = 0; i < data.length; i++) {
       d.push(data[i]);
@@ -113,5 +113,11 @@ export function objectUpdate(origin, update) {
   for (const k in update) {
     now[k] = update[k];
   }
-  return now; 
+  return now;
+}
+
+export function isChinese(temp) {
+  var re = /[^\u4E00-\u9FA5]/;
+  if (re.test(temp)) return false;
+  return true;
 }

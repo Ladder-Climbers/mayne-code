@@ -8,6 +8,7 @@ const defaultState = {
   daemon: null,
   errorInfo: null,
   message: null,
+  searchInfo: null
 }
 
 function config(state = defaultState.config, action) {
@@ -65,4 +66,13 @@ function message(state = defaultState.message, action) {
   }
 }
 
-export default combineReducers({ config, errorInfo, message, daemon, user, tasks });
+function searchInfo(state = defaultState.searchInfo, action) {
+  switch (action.type) {
+    case "SET_SEARCH_INFO":
+      return action.data;
+    default:
+      return state;
+  }
+}
+
+export default combineReducers({ config, errorInfo, message, daemon, user, tasks, searchInfo });
