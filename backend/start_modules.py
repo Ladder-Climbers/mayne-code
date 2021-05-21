@@ -6,6 +6,24 @@ from utils.logger import logger
 import platform
 
 
+def execute_module(module_name: str, cmd: str, retry: int = 0) -> bool:
+    res = os.system(cmd)
+    if res != 0:
+        if retry < Constants.MODULES_RUN_RETRY:
+            logger.warning(f'module {module_name} returns {res}, retry = {retry}.')
+            return execute_module(module_name, cmd, retry + 1)
+        else:
+            logger.error(f'modules {module_name} returns {res}, execute failed.')
+            if Constants.MODULES_RUN_FOREVER:
+                # 不 计 前 嫌
+                return execute_module(module_name, cmd)
+            else:
+                return False
+    else:
+        if Constants.MODULES_RUN_FOREVER:
+            return execute_module(module_name, cmd)
+
+
 def run_module(module_name: str, modules_path: str = Constants.MODULES_PATH):
     if module_name not in Constants.MODULES:
         return
@@ -26,7 +44,7 @@ def run_module(module_name: str, modules_path: str = Constants.MODULES_PATH):
     # os.chdir(path_origin)
     logger.info(f'module {module_name} starting with cmd: '
                 f'{cmd}')
-    os.system(cmd)
+
 
 
 def start_module(module_name: str, modules_path: str = Constants.MODULES_PATH):
