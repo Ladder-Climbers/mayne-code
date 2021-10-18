@@ -48,7 +48,7 @@ def get_tag_books(tag: str, start: int):
             'description': my_strip(subject_item.find('p').get_text()),
             'base_info': my_strip(subject_item.find('div', class_='pub').get_text()),
             'comment_number': int(
-                re.findall(r'\([0-9]*', my_strip(subject_item.find('span', class_='pl').get_text()))[0][1:])
+                re.findall(r'\([0-9]*', my_strip(subject_item.find('span', class_='pl').get_text()))[0][1:]),
             'douban_id': int(subject_item.find('a').attrs.get('href').split('/')[-2]),
             'pricing': [my_strip(a.get_text()) for a in
                         subject_item.find('span', class_='buy-info').find_all('a')]
