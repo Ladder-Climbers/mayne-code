@@ -63,7 +63,7 @@ type BingAnswer struct {
 	} `json:"rankingResponse"`
 }
 
-func BingSearch(searchTerm string, token string) []string {
+func BingSearch(searchTerm string, token string) ([]string, error) {
 	// Bing API URL
 	const endpoint = "https://api.bing.microsoft.com/v7.0/search"
 	req, err := http.NewRequest("GET", endpoint, nil)
@@ -80,21 +80,21 @@ func BingSearch(searchTerm string, token string) []string {
 	client := new(http.Client)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalln("Error(s) occurred while making the request:", err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln("Error(s) occurred while reading the response:", err)
+		return nil, err
 	}
 	ans := new(BingAnswer)
 	err = json.Unmarshal(body, &ans)
 	if err != nil {
-		log.Println("Error(s) occurred while unmarshalling the JSON:", err)
+		return nil, err
 	}
 	var urlList []string
 	for _, result := range ans.WebPages.Value {
 		urlList = append(urlList, result.URL)
 	}
-	return urlList
+	return urlList, nil
 }

@@ -44,7 +44,7 @@ def run_module(module_name: str, modules_path: str = Constants.MODULES_PATH):
     # os.chdir(path_origin)
     logger.info(f'module {module_name} starting with cmd: '
                 f'{cmd}')
-
+    execute_module(module_name, cmd)
 
 
 def start_module(module_name: str, modules_path: str = Constants.MODULES_PATH):
@@ -57,6 +57,6 @@ def start_module(module_name: str, modules_path: str = Constants.MODULES_PATH):
 
 def start_all(modules_path: str = Constants.MODULES_PATH):
     for name in Constants.MODULES:
-        # logger.info(f'module {name} starting with cmd: '
-        #             f'{Constants.MODULES[name] if Constants.MODULES[name] is not None else "(in file)"}')
+        logger.info(f'module {name} starting with cmd: '
+                    f'{Constants.MODULES[name] if Constants.MODULES[name] is not None else "(in file)"}')
         start_module(name, modules_path)

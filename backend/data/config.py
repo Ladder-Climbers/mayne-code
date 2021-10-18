@@ -5,6 +5,7 @@ import secrets
 from itsdangerous import TimedJSONWebSignatureSerializer as TJWSS
 from utils.rpc_type import *
 from pytz import utc
+import platform
 
 
 class Constants:
@@ -12,6 +13,9 @@ class Constants:
     VERSION = "0.2.0"
     ADMIN = "chiro"
     EMAIL = "Chiro2001@163.com"
+    # Environment
+    ENVIRONMENT = os.environ.get("ENV") if os.environ.get("ENV") is not None else (
+        "release" if platform.system() == 'Linux' else "dev")
     # Find
     # FIND_LIMIT = 30
     FIND_LIMIT = 8
@@ -57,8 +61,8 @@ class Constants:
     RUN_LISTENING = "0.0.0.0"
     RUN_PORT = int(os.environ.get("PORT", 8080))
     RUN_USE_RELOAD = False
-    RUN_REBASE = True
-    # RUN_REBASE = False
+    # RUN_REBASE = True
+    RUN_REBASE = False
     # Request API
     REQUEST_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:86.0) Gecko/20100101 Firefox/86.0"
     # Modules
@@ -105,6 +109,10 @@ class Constants:
     }
     # Dismiss rebase for multiprocessing
     DISMISS_REBASE = 'MAYNE_RUNNING_PID'
+    # Spider
+    # Proxy
+    PROXY_POOL_API = 'http://shimamura.chiro.work:5010/' if ENVIRONMENT == 'dev' else 'http://127.0.0.1:5010/'
+    PROXY_POOL_SIZE = 10
 
 
 class Statics:

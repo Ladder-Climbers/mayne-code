@@ -20,7 +20,7 @@ export default function Dashboard(props) {
     </Box>
     <br />
     <Divider></Divider>
-    <Slides></Slides>
+    {/* <Slides></Slides> */}
     <br />
     <Divider></Divider>
     <br />

@@ -31,7 +31,7 @@ class DataBase:
         self.session = SessionDB(self.db)
         self.sync = SyncDB(self.db)
 
-    def rebase(self):
+    def rebasree(self):
         logger.warning('Rebasing...')
         for col in DataBase.COLLECTIONS:
             # logger.info(f'Dropping {col}')

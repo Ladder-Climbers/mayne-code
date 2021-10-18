@@ -1,32 +1,19 @@
 package main
 
 import (
-	"bookFinder/app/api"
 	"bookFinder/app/model/args"
 	_ "bookFinder/boot"
-	"github.com/gorilla/mux"
-	"github.com/gorilla/rpc/v2"
-	"github.com/gorilla/rpc/v2/json2"
+	"bookFinder/router"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 )
 
 func main() {
-	log.Println("============[Mayne's Book Finder]============")
-	log.Println("(C) 2020-2021 LadderClimbers. MIT License.")
-	s := rpc.NewServer()
-	s.RegisterCodec(json2.NewCodec(), "application/json")
-	s.RegisterCodec(json2.NewCodec(), "application/json;charset=UTF-8")
-	bf := new(api.BookFinder)
-	err := s.RegisterService(bf, "")
+	err := http.ListenAndServe(":"+strconv.Itoa(args.ServicePort), router.Router)
 	if err != nil {
-		log.Fatal("Error(s) occurred while registering service.")
-	}
-	r := mux.NewRouter()
-	r.Handle(args.ServiceAPI, s)
-	err = http.ListenAndServe(":"+strconv.Itoa(args.ServicePort), r)
-	if err != nil {
-		log.Fatal("Error(s) occurred while starting server.")
+		log.Println("Error(s) occurred while running server.")
+		os.Exit(1)
 	}
 }

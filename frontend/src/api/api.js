@@ -37,7 +37,7 @@ class API {
     let config = store.getState().config;
     config.data.api_token = this.get_token();
     console.log('config.data.api_token', config.data.api_token)
-    // config.save();
+    config.save();
     store.dispatch(setConfig(config));
   }
   load_from_config() {

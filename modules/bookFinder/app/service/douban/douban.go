@@ -3,33 +3,50 @@ package douban
 import (
 	"bookFinder/app/model/args"
 	"bookFinder/app/model/types"
+	"bookFinder/app/service/limit"
 	"bytes"
-	"github.com/gorilla/rpc/v2/json2"
-	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/rpc/v2/json2"
 )
 
-func DoubanSearch(bookName string, ranking int, booksChannel chan types.Book) {
-	log.Println(bookName)
+/**
+ * 豆瓣图书搜索
+ * @param bookName 书名
+ * @param bookCount 出现次数
+ * @param ranking 原来排序的编号
+ * @param booksChannel 结果返回通道
+ */
+func DoubanSearch(bookName string, bookCount int, ranking int, booksChannel chan types.Book) {
 	url := "http://localhost:" + strconv.Itoa(args.DoubPort) + args.DoubAPI
 	keyword := []string{bookName}
 
 	message, err := json2.EncodeClientRequest("search", keyword)
 	if err != nil {
-		log.Fatalln("Error(s) occurred while encoding JSON:", err)
+		booksChannel <- types.Book{
+			Error: err,
+		}
+		return
 	}
 
 	resp, err := http.Post(url, "application/json;charset=UTF-8", bytes.NewReader(message))
-	defer resp.Body.Close()
+	<-limit.Douban
 	if err != nil {
-		log.Fatalln("Error(s) occurred while searching douban:", err)
+		booksChannel <- types.Book{
+			Error: err,
+		}
+		return
 	}
+	defer resp.Body.Close()
 
 	var books []types.Book
 	err = json2.DecodeClientResponse(resp.Body, &books)
 	if err != nil {
-		log.Fatalln("Error(s) occurred while decoding JSON:", err)
+		booksChannel <- types.Book{
+			Error: err,
+		}
+		return
 	}
 
 	var simBook types.Book
@@ -42,6 +59,7 @@ func DoubanSearch(bookName string, ranking int, booksChannel chan types.Book) {
 		}
 	}
 	simBook.Ranking = ranking
+	simBook.PresenceCount = bookCount
 	booksChannel <- simBook
 }
 
@@ -61,11 +79,11 @@ func getLevenshteinDistance(str1 string, str2 string) int {
 	len1 := len(runeStr1)
 	len2 := len(runeStr2)
 	distance := make([][]int, len1+1)
-	for i, _ := range distance {
+	for i := range distance {
 		distance[i] = make([]int, len2+1)
 		distance[i][0] = i
 	}
-	for i, _ := range distance[0] {
+	for i := range distance[0] {
 		distance[0][i] = i
 	}
 	for i := 1; i <= len1; i++ {
