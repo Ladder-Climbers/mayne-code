@@ -26,6 +26,26 @@ class DoubanDB(Database):
             return {}
         return data.get('tags', {})
 
+    def set_tag_max(self, tag: str, max_start: int):
+        auto_time_update(self.col_tags, {"tags_max": True, "tag": tag},
+                         {"tags_max": True, "tag": tag, "max_start": max_start})
+
+    def get_tag_max(self, tag: str) -> int:
+        data = find_one(self.col_tags, {"tags_max": True, "tag": tag})
+        if data is None:
+            return 1000
+        return data.get('max_start')
+
+    def set_tag_finish(self, tag: str, start: int, finished: bool):
+        auto_time_update(self.col_tags, {"tags_finish_mark": True, "tag": tag, "start": start},
+                         {"tags_finish_mark": True, "tag": tag, "finished": finished, "start": start})
+
+    def get_tag_finish(self, tag: str, start: int) -> bool:
+        data = find_one(self.col_tags, {"tags_finish_mark": True, "tag": tag, "start": start})
+        if data is None:
+            return False
+        return data.get('finished')
+
     def update_item(self, item: DoubanItem):
         item_dict = item
         if not isinstance(item_dict, dict):

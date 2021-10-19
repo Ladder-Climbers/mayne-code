@@ -1,5 +1,6 @@
 import re
 import traceback
+import urllib
 
 import requests
 from bs4 import BeautifulSoup as Soup
@@ -46,13 +47,16 @@ class DoubanSpider(scrapy.Spider):
         while not done:
             done = True
             for tag in tags:
-                if tags[tag] > MAX_OFFSET:
+                tag_max = douban_db.get_tag_max(tag=tag)
+                if tags[tag] > min(MAX_OFFSET, tag_max):
                     continue
                 done = False
-                self.logger.info(f"fetching {tag} start={tags[tag]}")
-                yield Request(self.target_page_url.format(tag=tag, start=tags[tag]),
-                              meta={"proxy": get_proxy().get('proxy')},
-                              callback=self.parse, errback=self.handle_errors)
+                if not douban_db.get_tag_finish(tag=tag, start=tags[tag]):
+                    self.logger.info(f"fetching {tag} start={tags[tag]}")
+                    yield Request(self.target_page_url.format(tag=tag, start=tags[tag]),
+                                  # meta={"proxy": get_proxy().get('proxy')},
+                                  callback=self.parse, errback=self.handle_errors)
+                douban_db.set_tag_finish(tag=tag, start=tags[tag], finished=True)
                 tags[tag] += 20
                 douban_db.update_tags(tags)
 
@@ -65,21 +69,31 @@ class DoubanSpider(scrapy.Spider):
 
     def parse(self, response) -> list:
         url = response.url
-        tag_list = re.search(r'/.*\?', url)
+        url_info = urllib.parse.urlparse(url)
+        tag = urllib.parse.unquote(url_info.path)[5:]
         # TODO: 1. 添加最末页码更新
         #       2. 请求失败的时候删除代理
         #       3. 请求失败删除代理之后再请求
-        # if
+        html = response.body
+        if not isinstance(html, str):
+            html = html.decode(errors='ignore')
+        if '没有找到符合条件的图书' in html:
+            return []
         soup = Soup(response.body, 'lxml')
         subject_list = soup.find('ul', class_='subject-list')
+
+        paginator = soup.find("div", class_='paginator')
+        max_page = int(paginator.find_all('a')[-2].get_text())
+        if max_page > 50:
+            max_page = 50
+        self.logger.warning(f"tag: {tag}, max_page: {max_page}")
+        douban_db.set_tag_max(tag=tag, max_start=max_page * 20)
 
         def parse_subject_item(subject_item) -> dict:
             book_item = {
                 'title': my_strip(subject_item.find('h2').get_text()),
                 'douban_url': subject_item.find('a').attrs.get('href'),
                 'base_info': my_strip(subject_item.find('div', class_='pub').get_text()),
-                'comment_number': int(
-                    re.findall(r'\([0-9]*', my_strip(subject_item.find('span', class_='pl').get_text()))[0][1:]),
                 'douban_id': int(subject_item.find('a').attrs.get('href').split('/')[-2]),
                 'pricing': [my_strip(a.get_text()) for a in
                             subject_item.find('span', class_='buy-info').find_all('a')]
@@ -88,14 +102,21 @@ class DoubanSpider(scrapy.Spider):
             try:
                 book_item['rating_nums'] = float(my_strip(subject_item.find('span', class_='rating_nums').get_text()))
             except (AttributeError, ValueError) as e:
-                self.logger.warning(f'{e}')
-                traceback.print_exc()
+                self.logger.warning(f'rating_nums {e}')
+                # traceback.print_exc()
+
+            try:
+                book_item['comment_number'] = int(
+                    re.findall(r'\([0-9]*', my_strip(subject_item.find('span', class_='pl').get_text()))[0][1:]),
+            except (AttributeError, ValueError) as e:
+                self.logger.warning(f'comment_number {e}')
+                # traceback.print_exc()
 
             try:
                 book_item['description'] = my_strip(subject_item.find('p').get_text())
             except AttributeError as e:
-                self.logger.warning(f'{e}')
-                traceback.print_exc()
+                self.logger.warning(f'description {e}')
+                # traceback.print_exc()
 
             item = DoubanItem()
             for key in book_item:
