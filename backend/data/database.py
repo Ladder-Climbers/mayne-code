@@ -12,7 +12,7 @@ from sync.database import *
 class DataBase:
     # 用到的所有数据集合
     COLLECTIONS = [
-        'user', 'user_uid', 'mayne_bug', 'session', 'session_disabled_token', 'sync'
+        'user', 'user_uid', 'mayne_bug', 'session', 'session_disabled_token', 'sync', 'square'
     ]
 
     def __init__(self, dismiss_rebase=False):

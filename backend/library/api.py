@@ -4,16 +4,16 @@ import asyncio
 from search.rpcs import rpcs_search
 
 
-class SearchAPI(Resource):
+class LibraryAPI(Resource):
     """
-    搜索API
+    书库API
     """
-    args_search = reqparse.RequestParser() \
-        .add_argument("srcs", type=str, help="搜索来源[a,b,c]", required=False, location=["args", ]) \
-        .add_argument("src", type=str, help="搜索来源", required=False, location=["args", ],
-                      choices=list(Constants.SEARCH_SRC.keys())) \
-        .add_argument("key", type=str, help="搜索关键词", required=True, location=["args", ]) \
-        .add_argument("page", type=int, help="跳页页数", required=False, location=["args", ])
+    # args_search = reqparse.RequestParser() \
+    #     .add_argument("srcs", type=str, help="搜索来源[a,b,c]", required=False, location=["args", ]) \
+    #     .add_argument("src", type=str, help="搜索来源", required=False, location=["args", ],
+    #                   choices=list(Constants.SEARCH_SRC.keys())) \
+    #     .add_argument("key", type=str, help="搜索关键词", required=True, location=["args", ]) \
+    #     .add_argument("page", type=int, help="跳页页数", required=False, location=["args", ])
 
     @args_required_method(args_search)
     def get(self):

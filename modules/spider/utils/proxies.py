@@ -10,7 +10,7 @@ proxy_last = None
 def get_proxy() -> dict:
     global proxy_last
     try:
-        js = requests.get(f"{Constants.PROXY_POOL_API}get/", timeout=2).json()
+        js = requests.get(f"{Constants.PROXY_POOL_API}get/", timeout=10).json()
         if 'proxy' in js:
             proxy_last = deepcopy(js)
             return js

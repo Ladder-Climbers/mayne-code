@@ -1,6 +1,7 @@
 import re
 import traceback
 import urllib
+from copy import deepcopy
 
 import requests
 from bs4 import BeautifulSoup as Soup
@@ -32,35 +33,60 @@ class DoubanSpider(scrapy.Spider):
     name = 'douban'
     allowed_domains = ['douban.com']
     # start_urls = ['https://book.douban.com/tag/%E5%B0%8F%E8%AF%B4?start=20&type=T']
-    target_page_url = 'https://book.douban.com/tag/{tag}?start={start}&type=T'
+    douban_sort_types = ['T', 'S', 'R']
+    target_page_url = 'https://book.douban.com/tag/{tag}?start={start}&type={sort_type}'
 
     def start_requests(self):
-        # 先获取 Tags 列表和对应进度
-        tags = douban_db.get_tags()
-        if len(tags.keys()) == 0:
-            tags_list = fetch_tags()
-            tags = {key: 0 for key in tags_list}
-            douban_db.update_tags(tags)
+        douban_sort_types_order = {
+            self.douban_sort_types[0]: self.douban_sort_types[1],
+            self.douban_sort_types[1]: self.douban_sort_types[2],
+            self.douban_sort_types[2]: None
+        }
+        sort_type = self.douban_sort_types[0]
         # 开爬，轮流来
         MAX_OFFSET = 1000
         done = False
-        while not done:
-            done = True
-            for tag in tags:
-                tag_max = douban_db.get_tag_max(tag=tag)
-                if tags[tag] > min(MAX_OFFSET, tag_max):
-                    continue
-                done = False
-                if not douban_db.get_tag_finish(tag=tag, start=tags[tag]):
-                    self.logger.info(f"fetching {tag} start={tags[tag]}")
-                    yield Request(self.target_page_url.format(tag=tag, start=tags[tag]),
-                                  # meta={"proxy": get_proxy().get('proxy')},
-                                  callback=self.parse, errback=self.handle_errors)
-                douban_db.set_tag_finish(tag=tag, start=tags[tag], finished=True)
-                tags[tag] += 20
-                douban_db.update_tags(tags)
+        tags_max = {}
+        while sort_type is not None:
+            # 先获取 Tags 列表和对应进度
+            tags = douban_db.get_tags(sort_type=sort_type)
+            if len(tags.keys()) == 0:
+                tags_list = fetch_tags()
+                tags = {key: 0 for key in tags_list}
+                douban_db.update_tags(tags, sort_type=sort_type)
 
-        self.logger.info(f"DONE!")
+            while not done:
+                done = True
+                finished_info = {}
+                for tag in tags:
+                    if tag in tags_max and tags_max[tag] is not None:
+                        tag_max = tags_max[tag]
+                    else:
+                        tag_max = douban_db.get_tag_max(tag=tag, sort_type=sort_type)
+                        tags_max[tag] = tag_max
+                    if tag_max is None:
+                        tag_max = MAX_OFFSET
+                    if tags[tag] > min(MAX_OFFSET, tag_max):
+                        continue
+                    done = False
+                    if tag not in finished_info:
+                        finished_info[tag] = douban_db.get_tag_finish_set(tag, sort_type=sort_type)
+                    # self.logger.warning(f"finished_info[tag] = {finished_info[tag]}")
+                    if (sort_type, tags[tag]) not in finished_info[tag]:
+                        self.logger.info(f"fetching {sort_type} {tag} start={tags[tag]}")
+                        yield Request(self.target_page_url.format(tag=tag, start=tags[tag], sort_type=sort_type),
+                                      # meta={"proxy": get_proxy().get('proxy')},
+                                      callback=self.parse, errback=self.handle_errors)
+                    else:
+                        self.logger.debug(f"fetched {sort_type} {tag} start={tags[tag]}")
+                    douban_db.set_tag_finish(tag=tag, start=tags[tag], finished=True)
+                    finished_info[tag].add(deepcopy((sort_type, tags[tag])))
+                    tags[tag] += 20
+                    douban_db.update_tags(tags, sort_type=sort_type)
+
+            self.logger.info(f"DONE sort_type: {sort_type}!")
+            sort_type = douban_sort_types_order[sort_type]
+        self.logger.info(f"DONE ALL!")
 
     def handle_errors(self, failure):
         request = failure.request
@@ -71,23 +97,24 @@ class DoubanSpider(scrapy.Spider):
         url = response.url
         url_info = urllib.parse.urlparse(url)
         tag = urllib.parse.unquote(url_info.path)[5:]
-        # TODO: 1. 添加最末页码更新
-        #       2. 请求失败的时候删除代理
-        #       3. 请求失败删除代理之后再请求
+        sort_type = urllib.parse.parse_qs(url_info.query).get('type')[0]
         html = response.body
         if not isinstance(html, str):
             html = html.decode(errors='ignore')
         if '没有找到符合条件的图书' in html:
-            return []
+            yield None
+            return
         soup = Soup(response.body, 'lxml')
         subject_list = soup.find('ul', class_='subject-list')
 
         paginator = soup.find("div", class_='paginator')
-        max_page = int(paginator.find_all('a')[-2].get_text())
-        if max_page > 50:
-            max_page = 50
+        max_page = None
+        if paginator is not None:
+            max_page = int(paginator.find_all('a')[-2].get_text())
+            if max_page > 50:
+                max_page = 50
+            douban_db.set_tag_max(tag=tag, max_start=max_page * 20, sort_type=sort_type)
         self.logger.warning(f"tag: {tag}, max_page: {max_page}")
-        douban_db.set_tag_max(tag=tag, max_start=max_page * 20)
 
         def parse_subject_item(subject_item) -> dict:
             book_item = {
