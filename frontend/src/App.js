@@ -48,6 +48,7 @@ import { isIterator, isMobileDevice, sleep } from "./utils/utils";
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Library from "./pages/Library";
+import BookInfo from "./pages/BookInfo";
 import Square from "./pages/Square";
 import About from './pages/About';
 import Help from './pages/Help';
@@ -306,6 +307,9 @@ function App() {
         </Route>
         <Route path={"/about"} exact={true}>
           <About></About>
+        </Route>
+        <Route path={"/book_info"} exact={true}>
+          <BookInfo></BookInfo>
         </Route>
       </Switch>
     </main>

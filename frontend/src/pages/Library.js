@@ -1,12 +1,9 @@
 import { Container } from "@material-ui/core";
 import React from "react";
 import { api } from "../api/api";
-import SearchBox from "../components/SearchBox";
-import SearchResult, { LocalDatabaseResult } from "../components/SearchResult";
-import { setSearchInfo } from "../data/action";
+import { LocalDatabaseResult } from "../components/SearchResult";
 import store from "../data/store";
 import history from "../utils/history";
-import { getHashedQuery } from "../utils/utils";
 
 export default function Library(props) {
   const [result, setResult] = React.useState(null);
