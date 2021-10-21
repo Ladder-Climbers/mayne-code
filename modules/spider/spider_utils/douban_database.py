@@ -1,8 +1,8 @@
 import pymongo
 
-from spider.items import DoubanItem
-from utils.constants import Constants
-from utils.db_tools import auto_time_update, find_one, find_many
+# from spider.items import DoubanItem
+from spider_utils.constants import Constants
+from spider_utils.db_tools import auto_time_update, find_one, find_many
 
 
 class Database:
@@ -61,7 +61,10 @@ class DoubanDB(Database):
         data_set = {(d.get('sort_type'), d.get('start')) for d in data if d.get('finished')}
         return data_set
 
-    def update_item(self, item: DoubanItem):
+    def get_items(self, *args, **kwargs):
+        return find_many(self.col, *args, **kwargs)
+
+    def update_item(self, item):
         item_dict = item
         if not isinstance(item_dict, dict):
             item_dict = dict(item)

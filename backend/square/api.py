@@ -1,94 +1,111 @@
 from utils.api_tools import *
 
 
-class Session(Resource):
-    """
-    用户活动认证相关
-    """
-    args_login = reqparse.RequestParser() \
-        .add_argument("username", help="用户名", type=str, required=True, location=["json", ]) \
-        .add_argument("password", help="密码", type=str, required=True, location=["json", ])
-    args_update = reqparse.RequestParser() \
-        .add_argument("Refresh", help="refresh_token", type=str, required=True, location=Constants.JWT_LOCATIONS)
+class SquareCommentsAPI(Resource):
+    args_post = reqparse.RequestParser() \
+        .add_argument("book_title", help="书名", type=str, required=True, location=["json", ]) \
+        .add_argument("rating", help="评分", type=float, required=False, location=["json", ]) \
+        .add_argument("content", help="评论内容", type=str, required=True, location=["json", ])
+    args_get = reqparse.RequestParser() \
+        .add_argument("book_title", help="书名", type=str, required=True, location=["args", ])
 
-    @args_required_method(args_login)
-    def post(self):
-        """
-        登录
-        """
-        args = self.args_login.parse_args()
-        username, password = args.get('username'), args.get('password')
-        user = db.user.find_by_username(username=username)
-        if user is None:
-            return make_result(403)
-        uid = user.get('uid')
-        result = db.session.check_password(uid=uid, password=password)
-        if not result:
-            return make_result(403)
-        db.session.update_login(uid)
-        token_payload = {'uid': uid}
-        access_token = create_access_token(token_payload)
-        refresh_token = create_refresh_token(token_payload)
-        return make_result(data={'access_token': access_token, 'refresh_token': refresh_token})
-
-    @args_required_method(args_update)
-    def get(self):
-        """
-        更新 access_token
-        """
-        refresh_token = self.args_update.parse_args(http_error_code=401).get('Refresh')
-        try:
-            data = Statics.tjw_refresh_token.loads(refresh_token)
-        except (BadSignature, BadData, BadHeader, BadPayload) as e:
-            return make_result(422, message=f"Bad token: {e}")
-        except BadTimeSignature:
-            return make_result(424)
-        # 禁用原来的 refresh_token
-        db.session.disable_token(refresh_token=refresh_token)
-        uid = data.get('uid')
-        payload = {
-            'uid': uid
-        }
-        access_token = create_access_token(payload)
-        refresh_token_new = create_refresh_token(payload)
-        return make_result(data={
-            'access_token': access_token,
-            'refresh_token': refresh_token_new
-        })
-
-    @auth_required_method
-    def delete(self, access_token: str):
-        """
-        注销
-        """
-        # logger.warning('access_token: ' + access_token)
-        refresh_token = self.args_update.parse_args(http_error_code=401).get('Refresh')
-        # logger.warning('refresh_token: ' + refresh_token)
-        try:
-            Statics.tjw_refresh_token.loads(refresh_token)
-        except (BadSignature, BadData, BadHeader, BadPayload) as e:
-            return make_result(422, message=f"Bad token: {e}")
-        except BadTimeSignature:
-            return make_result(424)
-        db.session.disable_token(access_token=access_token, refresh_token=refresh_token)
-        return make_result()
-
-
-class Password(Resource):
-    """
-    密码操作
-    """
-    args_update_password = reqparse.RequestParser() \
-        .add_argument("password", help="新密码", type=str, required=True, location=["json", ])
-
-    @args_required_method(args_update_password)
+    @args_required_method(args_post)
     @auth_required_method
     def post(self, uid: int):
-        """
-        密码更新
-        """
-        password = self.args_update_password.parse_args().get('password')
-        if not db.session.update_one({'uid': uid, 'password': password}):
-            return make_result(400)
-        # logger.error(f'update password done: uid={uid}, password={password}')
+        args = self.args_post.parse_args()
+        book_title, rating, content = args.get('book_title'), args.get('rating'), args.get('content')
+        db.square_comments.add(uid, book_title, content, rating=rating)
         return make_result()
+
+    @args_required_method(args_get)
+    def get(self):
+        data = db.square_comments.find(self.args_get.parse_args().get('book_title'))
+        return make_result(data={'comments': data})
+
+
+class SquareBookListAPI(Resource):
+    args_post = reqparse.RequestParser() \
+        .add_argument("book_title", help="书名", type=str, required=True, location=["json", ]) \
+        .add_argument("list_name", help="书单名称", type=str, required=True, location=["json", ])
+    args_get = reqparse.RequestParser() \
+        .add_argument("list_name", help="书单名称", type=str, required=False, location=["args", ])
+
+    @args_required_method(args_post)
+    @auth_required_method
+    def post(self, uid: int):
+        args = self.args_post.parse_args()
+        db.square_book_list.add(uid, args.get('book_title'), args.get('list_name'))
+        return make_result()
+
+    @args_required_method(args_get)
+    @auth_required_method
+    def get(self, uid: int):
+        list_name = self.args_get.parse_args().get('list_name')
+        if list_name is None:
+            return make_result(data={'book_lists': db.square_book_list.find_lists(uid)})
+        return make_result(data={'book_list': db.square_book_list.find(uid, list_name)})
+
+
+class SquareMessagesAPI(Resource):
+    args_post = reqparse.RequestParser() \
+        .add_argument("to_uid", help="目标用户", type=str, required=True, location=["json", ]) \
+        .add_argument("content", help="私信内容", type=str, required=True, location=["json", ])
+
+    @args_required_method(args_post)
+    @auth_required_method
+    def post(self, uid: int):
+        args = self.args_post.parse_args()
+        db.square_messages.add(uid, args.get('to_uid'), args.get('content'))
+        return make_result()
+
+    @auth_required_method
+    def get(self, uid: int):
+        data = db.square_messages.find(uid)
+        return make_result(data={'messages': data})
+
+
+class SquareRelationsAPI(Resource):
+    args_post = reqparse.RequestParser() \
+        .add_argument("to_uid", help="目标用户", type=int, required=True, location=["json", ]) \
+        .add_argument("is_friends", help="是否关注", type=bool, required=False, location=["json", ])
+    args_get = reqparse.RequestParser() \
+        .add_argument("to_uid", help="目标用户", type=int, required=False, location=["args", ])
+
+    @args_required_method(args_post)
+    @auth_required_method
+    def post(self, uid: int):
+        args = self.args_post.parse_args()
+        db.square_relations.add(uid, args.get('to_uid'), args.get('is_friends', True))
+        return make_result()
+
+    @args_required_method(args_get)
+    @auth_required_method
+    def get(self, uid: int):
+        to_uid = self.args_get.parse_args().get('to_uid')
+        if to_uid is not None:
+            return make_result(data={'relations': {'is_friends': db.square_relations.find_one(uid, to_uid)}})
+        return make_result(data={'relations': {'friends': db.square_relations.find(uid)}})
+
+
+class SquareDynamicAPI(Resource):
+    args_post = reqparse.RequestParser() \
+        .add_argument("dynamic", help="动态内容", type=str, required=True, location=["json", ])
+    args_get = reqparse.RequestParser() \
+        .add_argument("to_uid", help="目标用户", type=int, required=False, location=["args", ])
+
+    @args_required_method(args_post)
+    @auth_required_method
+    def post(self, uid: int):
+        args = self.args_post.parse_args()
+        db.square_dynamic.add(uid, dynamic=args.get('dynamic'))
+        return make_result()
+
+    @args_required_method(args_get)
+    @auth_required_method
+    def get(self, uid: int):
+        return make_result(data={'dynamic': db.square_dynamic.find(uid)})
+
+
+class SquareAllAPI(Resource):
+    def get(self):
+        return make_result(data={'all': db.square_all.find()})

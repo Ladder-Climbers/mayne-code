@@ -11,10 +11,11 @@ from scrapy import Request
 from twisted.internet.error import TimeoutError, TCPTimedOutError, ConnectionRefusedError
 
 from spider.items import DoubanItem
-from utils.constants import Constants
-from utils.db import douban_db
-from utils.proxies import get_proxy
-from utils.strings import my_strip
+from spider.spiders import DOUBAN_COOKIE
+from spider_utils.constants import Constants
+from spider_utils.douban_database import douban_db
+from spider_utils.proxies import get_proxy
+from spider_utils.strings import my_strip
 
 
 def fetch_tags() -> list:
@@ -76,6 +77,7 @@ class DoubanSpider(scrapy.Spider):
                         self.logger.info(f"fetching {sort_type} {tag} start={tags[tag]}")
                         yield Request(self.target_page_url.format(tag=tag, start=tags[tag], sort_type=sort_type),
                                       # meta={"proxy": get_proxy().get('proxy')},
+                                      cookies=DOUBAN_COOKIE,
                                       callback=self.parse, errback=self.handle_errors)
                     else:
                         self.logger.debug(f"fetched {sort_type} {tag} start={tags[tag]}")

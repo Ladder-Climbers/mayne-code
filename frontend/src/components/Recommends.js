@@ -74,7 +74,7 @@ export default function Recomends() {
       if (resp.code !== 200) {
         setErrorInfo(resp);
       } else {
-        setRequesting(false);
+        setRequesting(true);
         setBooks(resp.data.douban_top);
       }
     })

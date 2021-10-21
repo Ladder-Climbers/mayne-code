@@ -18,7 +18,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import LiveHelpIcon from '@material-ui/icons/LiveHelp';
 import GroupIcon from '@material-ui/icons/Group';
-import WebIcon from '@material-ui/icons/Web';
+import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import AlarmIcon from '@material-ui/icons/Alarm';
@@ -48,7 +48,7 @@ import { isIterator, isMobileDevice, sleep } from "./utils/utils";
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Library from "./pages/Library";
-import Services from "./pages/Services";
+import Square from "./pages/Square";
 import About from './pages/About';
 import Help from './pages/Help';
 import Settings from "./pages/Settings";
@@ -277,7 +277,7 @@ function App() {
         <ListItemLink to="/" primary="启动页" icon={<DashboardIcon />} />
         <ListItemLink to="/search" primary="找书" icon={<SearchIcon />} />
         <ListItemLink to="/library" primary="馆藏" icon={<LibraryBooksIcon />} />
-        <ListItemLink to="/services" primary="服务" icon={<WebIcon />} />
+        <ListItemLink to="/square" primary="广场" icon={<DynamicFeedIcon />} />
         <ListItemLink to="/settings" primary="设置" icon={<SettingsIcon />} />
         <ListItemLink to="/help" primary="帮助" icon={<LiveHelpIcon />} />
         <ListItemLink to="/about" primary="关于" icon={<GroupIcon />} />
@@ -298,8 +298,8 @@ function App() {
         <Route path={"/settings"} exact={false}>
           <Settings />
         </Route>
-        <Route path={"/services"} exact={true}>
-          <Services></Services>
+        <Route path={"/square"} exact={true}>
+          <Square></Square>
         </Route>
         <Route path={"/help"} exact={true}>
           <Help></Help>

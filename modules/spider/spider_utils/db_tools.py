@@ -1,7 +1,7 @@
 import pymongo
 import datetime
 
-from utils.constants import Constants
+from spider_utils.constants import Constants
 
 
 def dict_update(dist: dict, src: dict) -> dict:

@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import requests
 
-from utils.constants import Constants
+from spider_utils.constants import Constants
 
 proxy_last = None
 

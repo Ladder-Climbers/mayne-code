@@ -1,10 +1,10 @@
 import React from 'react';
 import { Container, Typography } from "@material-ui/core";
 
-export default function Services() {
+export default function Square() {
   return (<Container>
     <Typography>
-      Services here.
+      Square here.
     </Typography>
   </Container>);
 };

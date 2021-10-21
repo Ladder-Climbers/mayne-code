@@ -10,10 +10,12 @@ from scrapy import Request
 from twisted.internet.error import TimeoutError, TCPTimedOutError, ConnectionRefusedError
 
 from spider.items import DoubanItem, DoubanDetailsItem
-from utils.constants import Constants
-from utils.db import douban_db
-from utils.proxies import get_proxy
-from utils.strings import my_strip
+from spider.settings import DOUBAN_FAST, DOUBAN_PROXY
+from spider.spiders import DOUBAN_COOKIE
+from spider_utils.constants import Constants
+from spider_utils.douban_database import douban_db
+from spider_utils.proxies import get_proxy
+from spider_utils.strings import my_strip
 
 
 class DoubanDetailsSpider(scrapy.Spider):
@@ -41,10 +43,17 @@ class DoubanDetailsSpider(scrapy.Spider):
                 self.logger.debug(f"skip {douban_id_cnt}")
                 continue
             self.logger.info(f"fetching {douban_id_cnt}")
-            # proxy = get_proxy()
-            yield Request(self.target_page_url.format(douban_id=douban_id_cnt),
-                          # meta={"proxy": f"http{'s' if proxy.get('https', False) else ''}://{proxy.get('proxy')}"},
-                          callback=self.parse, errback=self.handle_errors)
+            if DOUBAN_PROXY:
+                proxy = get_proxy()
+                yield Request(self.target_page_url.format(douban_id=douban_id_cnt),
+                              meta={"proxy": f"http{'s' if proxy.get('https', False) else ''}://{proxy.get('proxy')}"},
+                              cookies=DOUBAN_COOKIE,
+                              callback=self.parse, errback=self.handle_errors)
+            else:
+                yield Request(self.target_page_url.format(douban_id=douban_id_cnt),
+                              cookies=DOUBAN_COOKIE,
+                              callback=self.parse, errback=self.handle_errors)
+            # self.logger.info(f"finishing {douban_id_cnt}")
             douban_details_finished.add(douban_id_cnt)
 
         self.logger.info(f"DONE!")
@@ -56,6 +65,7 @@ class DoubanDetailsSpider(scrapy.Spider):
 
     def parse(self, response) -> list:
         url = response.url
+        self.logger.debug(f"Start parsing {url}")
         url_info = urllib.parse.urlparse(url)
         douban_id = int(url_info.path.split('/')[2])
         html = response.body
@@ -63,6 +73,8 @@ class DoubanDetailsSpider(scrapy.Spider):
             html = html.decode(errors='ignore')
         if len(html) == 0:
             self.logger.debug(f"got empty page {douban_id}")
+            yield None
+            return
         if '异常请求' in html:
             self.logger.debug(f"请求异常 {douban_id}")
             yield None
@@ -75,6 +87,7 @@ class DoubanDetailsSpider(scrapy.Spider):
         self.logger.info(f"title: {soup.title}")
         book_info = soup.find("div", id='info')
         if book_info is None:
+            self.logger.debug(f"No #info {douban_id}")
             yield None
             return
         convert_map = {
@@ -200,7 +213,7 @@ class DoubanDetailsSpider(scrapy.Spider):
             except KeyError:
                 if details_item.get('extras', None) is None:
                     details_item['extras'] = {}
-                details['extras'][key] = details[key]
+                details_item['extras'][key] = details[key]
         yield details_item
         douban_db.set_details_finish(douban_id, finished=True)
         return None

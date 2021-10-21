@@ -5,8 +5,9 @@ from bs4 import BeautifulSoup as Soup
 
 
 def test_details():
-    url = "https://book.douban.com/subject/4913064/"
+    # url = "https://book.douban.com/subject/4913064/"
     # url = "https://book.douban.com/subject/35252459/"
+    url = "https://book.douban.com/subject/1000647/"
     resp = requests.get(url, headers={
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/93.0",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -16,10 +17,11 @@ def test_details():
         "Sec-Fetch-Mode": "navigate",
         "Sec-Fetch-Site": "same-origin",
         "Sec-Fetch-User": "?1",
-        "Cache-Control": "max-age=0"
+        "Cache-Control": "max-age=0",
+        "Cookie": """bid=nvSOKb3e_kY; _pk_id.100001.3ac3=e2d5b8eca75bca93.1621432056.15.1634642691.1634626483.; __utma=30149280.2076579599.1621432056.1634625369.1634642692.23; __utmz=30149280.1634550518.15.13.utmcsr=cnblogs.com|utmccn=(referral)|utmcmd=referral|utmcct=/; __utma=81379588.766923198.1621432056.1634626277.1634642692.15; __utmz=81379588.1634626277.14.8.utmcsr=cn.bing.com|utmccn=(referral)|utmcmd=referral|utmcct=/; viewed="1000647_35541390_1000001_35252459_35378783_1043815_1200840_4913064_26261735_30348068"; douban-f…IrjPG2dzOaZVU9YKWwMV; ct=y; push_noty_num=0; push_doumail_num=0; __utmv=30149280.23826; _ga_RXNMP372GL=GS1.1.1634613031.1.0.1634613033.58; _ga=GA1.2.2128100270.1634613032; ap_v=0,6.0; gr_session_id_22c937bbd8ebd703f2d8e9445f7dfd03=a0853268-d85f-4a95-90d5-70006915ab52; gr_cs1_816e1a27-0db8-472b-bedd-a0ce47a62b39=user_id%3A0; dbcl2="238268017:3kJuTVIhGR8"; ck=vPPv; gr_session_id_22c937bbd8ebd703f2d8e9445f7dfd03_a0853268-d85f-4a95-90d5-70006915ab52=true; gr_cs1_a0853268-d85f-4a95-90d5-70006915ab52=user_id%3A1""".encode('utf8').decode('latin-1', errors='ignore')
     })
     soup = Soup(resp.content, 'html.parser')
-    # print(soup.prettify())
+    print(soup.prettify())
     book_info = soup.find("div", id='info')
     convert_map = {
         '作者': 'author',

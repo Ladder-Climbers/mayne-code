@@ -17,8 +17,8 @@ class Constants:
     ENVIRONMENT = os.environ.get("ENV") if os.environ.get("ENV") is not None else (
         "release" if platform.system() == 'Linux' else "dev")
     # Find
-    # FIND_LIMIT = 30
-    FIND_LIMIT = 8
+    FIND_LIMIT = 30
+    # FIND_LIMIT = 8
     # JWT config
     JWT_SECRET_KEY = secrets.SECRET_WORDS
     JWT_HEADER_TYPE = ""

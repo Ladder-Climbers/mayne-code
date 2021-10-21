@@ -6,7 +6,7 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-from utils.constants import Constants
+from spider_utils.constants import Constants
 
 BOT_NAME = 'spider'
 
@@ -17,23 +17,40 @@ NEWSPIDER_MODULE = 'spider.spiders'
 # USER_AGENT = 'spider (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+# ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
+
+# FAST = False
+DOUBAN_FAST = True
+
+DOUBAN_PROXY = True
+
+if DOUBAN_FAST:
+    CONCURRENT_REQUESTS = 64
+    DOWNLOAD_DELAY = 0
+    CONCURRENT_REQUESTS_PER_DOMAIN = 64
+else:
+    CONCURRENT_REQUESTS = 1
+    DOWNLOAD_DELAY = 3
+    CONCURRENT_REQUESTS_PER_DOMAIN = 1
+
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 64
-CONCURRENT_REQUESTS = 2
+# CONCURRENT_REQUESTS = 1
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
 # DOWNLOAD_DELAY = 0
-DOWNLOAD_DELAY = 1
+# DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 64
-CONCURRENT_REQUESTS_PER_DOMAIN = 2
+# CONCURRENT_REQUESTS_PER_DOMAIN = 1
 # CONCURRENT_REQUESTS_PER_IP = 64
 
 # Disable cookies (enabled by default)
+COOKIES_ENABLED = True
 # COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
