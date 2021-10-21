@@ -8,12 +8,18 @@ import PopularTags from '../components/PopularTags';
 import Slides from '../components/Slides';
 import history from "../utils/history";
 import { urlEncode } from '../utils/utils';
+import { Redirect } from 'react-router-dom';
 export default function Dashboard(props) {
+  const [visit, setVisit] = React.useState(null);
+  if (visit) {
+    return <Redirect to={visit}></Redirect>;
+  }
   return (<Container>
     <Box>
       <Box style={{ paddingLeft: 40, paddingRight: 40 }}>
         <SearchBox onSearch={(key, src) => {
-          history.push({ pathname: "/search", search: '?' + urlEncode({ key, src }).slice(1) });
+          // history.push({ pathname: "/search", search: '?' + urlEncode({ key, src }).slice(1) });
+          setVisit(`/search?key=${key}&src=${src}`);
           // history.push({ pathname: "/search", params: { key, src } });
         }}></SearchBox>
       </Box>

@@ -5,6 +5,9 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import { urlEncode } from '../utils/utils';
+import history from '../utils/history';
+import { Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,6 +36,10 @@ export default function BookItem(props) {
   const { book } = props;
   const [expanded, setExpanded] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [visit, setVisit] = React.useState(null);
+  if (visit) {
+    return <Redirect to={visit}></Redirect>;
+  }
   return (<Card className={classes.root}>
     {/* <CardHeader
       action={
@@ -58,6 +65,8 @@ export default function BookItem(props) {
       onClick={(e) => {
         e.stopPropagation();
         console.log('to visit title:', book.title);
+        // history.push({ pathname: "/book_info", search: '?' + urlEncode({ title: book.title }).slice(1) });
+        setVisit(`/book_info?title=${book.title}`);
       }}
     >
     </CardMedia>
