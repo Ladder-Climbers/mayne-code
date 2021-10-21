@@ -27,6 +27,19 @@ function DoubanResult(props) {
   </Grid>;
 }
 
+export function LocalDatabaseResult(props) {
+  const { books } = props;
+  console.log('local props', props);
+  return <Grid container spacing={3}>
+    {books.map((book, k) => <Grid key={k} item xs={12} sm={6} lg={3}><BookItem book={{
+      title: book.title,
+      author: book.base_info,
+      desc: book.description,
+      cover: null
+    }}></BookItem></Grid>)}
+  </Grid>;
+}
+
 export default function SearchResult(props) {
   const { result } = props;
   return <List>
@@ -40,6 +53,12 @@ export default function SearchResult(props) {
       <Box>
         <Typography variant="h4">豆瓣搜索</Typography>
         <SmartSearchResult books={result.douban}></SmartSearchResult>
+      </Box>
+    </ListItem> : null}
+    {result.local_database ? <ListItem>
+      <Box>
+        <Typography variant="h4">数据库搜索</Typography>
+        <LocalDatabaseResult books={result.local_database.books}></LocalDatabaseResult>
       </Box>
     </ListItem> : null}
   </List>
