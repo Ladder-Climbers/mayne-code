@@ -25,7 +25,8 @@ class SearchAPI(Resource):
         .add_argument("src", type=str, help="搜索来源", required=False, location=["args", ],
                       choices=list(Constants.SEARCH_SRC.keys())) \
         .add_argument("key", type=str, help="搜索关键词", required=True, location=["args", ]) \
-        .add_argument("page", type=int, help="跳页页数", required=False, location=["args", ])
+        .add_argument("page", type=int, help="跳页页数", required=False, location=["args", ]) \
+        .add_argument("specific", type=bool, help="指定确定信息", required=False, location=["args", ])
 
     @args_required_method(args_search)
     def get(self):
@@ -54,13 +55,19 @@ class SearchAPI(Resource):
             # 建立数据库后：
             # db.adminCommand({setParameter:true,textSearchEnabled:true})
             # db.spider_douban.createIndex({title:"text"})
-            if key is None or (isinstance(key, str) and len(key) == 0):
-                data = douban_db.get_items({'douban_id': {"$exists": True}}, offset=page * Constants.FIND_LIMIT,
-                                           limit=Constants.FIND_LIMIT)
+            if args.get('specific', False):
+                data = douban_db.get_items({'title': key})
+                if len(data) == 0:
+                    return make_result(data={'search': {'local_database': {'books': [], 'count': 0}}})
+                return make_result(data={'search': {'local_database': {'books': data, 'count': 0}}})
             else:
-                data = douban_db.get_items({'douban_id': {"$exists": True}, "$text": {"$search": key}},
-                                           offset=page * Constants.FIND_LIMIT, limit=Constants.FIND_LIMIT)
-            return make_result(data={'search': {"local_database": {"books": data, "count": len(data)}}})
+                if key is None or (isinstance(key, str) and len(key) == 0):
+                    data = douban_db.get_items({'douban_id': {"$exists": True}}, offset=page * Constants.FIND_LIMIT,
+                                               limit=Constants.FIND_LIMIT)
+                else:
+                    data = douban_db.get_items({'douban_id': {"$exists": True}, "$text": {"$search": key}},
+                                               offset=page * Constants.FIND_LIMIT, limit=Constants.FIND_LIMIT)
+                return make_result(data={'search': {"local_database": {"books": data, "count": len(data)}}})
         loop = asyncio.get_event_loop()
         resp = loop.run_until_complete(rpcs_search(key, page=page, srcs=srcs))
         # return make_result(data={'search': resp['result']['books']})
