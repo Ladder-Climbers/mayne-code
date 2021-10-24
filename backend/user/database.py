@@ -45,3 +45,6 @@ class UserDB(BaseDB):
 
     def delete_user(self, uid: int):
         self.col.delete_one({'uid': uid})
+
+    def search(self, key: str) -> list:
+        return find_many(self.col, {"$text": {"$search": key}})

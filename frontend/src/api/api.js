@@ -6,13 +6,20 @@ import { isIterator, urlEncode } from "../utils/utils"
 
 class API {
   constructor() {
-    // this.host = '127.0.0.1';
-    // this.host = null;
-    this.host = window.location.href.includes("localhost") ? "localhost" : null;
-    this.port = 8080;
+    // this.host = window.location.href.includes("localhost") ? "localhost" : "pc.chiro.work";
+    // this.port = 8080;
+    // this.api_version = "v1";
+    // this.api_prefix = `/api/${this.api_version}`;
+    // this.protocol = 'http'
+    // this.url = this.host ? `${this.protocol}://${this.host}:${this.port}${this.api_prefix}` : `${this.api_prefix}`;
+    // this.access_token = '';
+    // this.refresh_token = '';
+
+    this.host = window.location.href.includes("localhost") ? "localhost" : "pc.chiro.work";
+    this.port = 443;
     this.api_version = "v1";
     this.api_prefix = `/api/${this.api_version}`;
-    this.protocol = 'http'
+    this.protocol = 'https'
     this.url = this.host ? `${this.protocol}://${this.host}:${this.port}${this.api_prefix}` : `${this.api_prefix}`;
     this.access_token = '';
     this.refresh_token = '';

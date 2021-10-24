@@ -45,6 +45,10 @@ export function parseTimePoint(time) {
   return moment(time).format('LLLL');
 }
 
+export function parseTime(time) {
+  return moment(time).calendar();
+}
+
 export function parseTimePeriod(time) {
   return moment.duration(time).humanize();
 }

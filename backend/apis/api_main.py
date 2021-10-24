@@ -3,6 +3,8 @@ from flask import Flask, Response
 from flask_cors import CORS
 from flask_restful import Resource, Api
 
+from ai.api import AiTbpAPI, AiTtsAPI
+from square.api import *
 from utils.docs import get_class_docs
 from search.api import SearchAPI
 
@@ -55,6 +57,14 @@ add_resource(Password, '/password')
 add_resource(Sync, '/sync')
 add_resource(DropData, '/drop_data')
 add_resource(DoubanTopAPI, '/douban_top')
+add_resource(SquareAllAPI, '/square')
+add_resource(SquareCommentsAPI, '/square/comments')
+add_resource(SquareRelationsAPI, '/square/relations')
+add_resource(SquareDynamicAPI, '/square/dynamic')
+add_resource(SquareMessagesAPI, '/square/messages')
+add_resource(SquareBookListAPI, '/square/book_list')
+add_resource(AiTbpAPI, '/ai/tbp')
+add_resource(AiTtsAPI, '/ai/tts')
 apply_resource()
 
 CORS(app)

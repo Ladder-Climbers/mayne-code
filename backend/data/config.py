@@ -57,10 +57,14 @@ class Constants:
     }
     # API config
     API_PATH = '/api/v1'
+    # SSL
+    SSL_CONTEXT = ("./pc.chiro.work.pem", "./pc.chiro.work.key")
+    # SSL_CONTEXT = None
     # Running config
     RUN_LISTENING = "0.0.0.0"
-    RUN_PORT = int(os.environ.get("PORT", 8080))
+    RUN_PORT = int(os.environ.get("PORT", 8080)) if SSL_CONTEXT is None else 443
     RUN_USE_RELOAD = False
+    RUN_FRONTEND_PROXY = False
     # RUN_REBASE = True
     RUN_REBASE = False
     # Request API
@@ -113,6 +117,9 @@ class Constants:
     # Proxy
     PROXY_POOL_API = 'http://shimamura.chiro.work:5010/' if ENVIRONMENT == 'dev' else 'http://127.0.0.1:5010/'
     PROXY_POOL_SIZE = 10
+    # AI
+    AI_BOT_ID = "2d46dead-fbdc-476d-b738-35910ca0c725"
+    AI_BOT_ENV = "dev"
 
 
 class Statics:

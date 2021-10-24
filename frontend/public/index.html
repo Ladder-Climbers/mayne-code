@@ -4,41 +4,67 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="referrer" content="never">
+    <meta name="referrer" content="never" />
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
       content="Web site created using create-react-app"
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
     <title>Mayne的大图书馆</title>
   </head>
   <body>
     <noscript>您的浏览器不支持 JavaScript，请更换浏览器。</noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+    <div class="waifu">
+      <div class="waifu-tips" style="white-space: pre-wrap"></div>
+      <canvas id="live2d" class="live2d"></canvas>
+      <div class="waifu-tool">
+        <span class="fui-home"></span>
+        <span class="fui-chat"></span>
+        <span class="fui-eye"></span>
+        <span class="fui-user"></span>
+        <span class="fui-photo"></span>
+        <span class="fui-info-circle"></span>
+        <span class="fui-cross"></span>
+      </div>
+    </div>
+    <script src="%PUBLIC_URL%/assets/jquery.min.js"></script>
+    <script src="%PUBLIC_URL%/assets/jquery-ui.min.js"></script>
+    <script src="%PUBLIC_URL%/assets/waifu-tips.js"></script>
+    <script src="%PUBLIC_URL%/assets/live2d.js"></script>
+    <script>
+      window.started = false;
+      const checkIt = function () {
+        // console.log('checking');
+        if (window.started === false) {
+          window.started = true;
+          live2d_settings["modelId"] = 4; // 默认模型 ID
+          // live2d_settings["modelTexturesId"] = 87; // 默认材质 ID
+          live2d_settings["modelStorage"] = false; // 不储存模型 ID
+          live2d_settings["canCloseLive2d"] = false; // 隐藏 关闭看板娘 按钮
+          live2d_settings["canTurnToHomePage"] = false; // 隐藏 返回首页 按钮
+          live2d_settings["waifuSize"] = "160x160"; // 看板娘大小
+          live2d_settings["waifuTipsSize"] = "150x100"; // 提示框大小
+          // live2d_settings["waifuFontSize"] = "30px"; // 提示框字体
+          // live2d_settings["waifuToolFont"] = "36px"; // 工具栏字体
+          // live2d_settings["waifuToolLine"] = "50px"; // 工具栏行高
+          live2d_settings["waifuToolTop"] = "-80px"; // 工具栏顶部边距
+          // live2d_settings["waifuDraggable"] = "axis-x"; // 拖拽样式
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+          live2d_settings["showHitokoto"] = false;
+          live2d_settings["showCopyMessage"] = false;
+          live2d_settings["waifuEdgeSide"] = "right:0";
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+          live2d_settings["showToolMenu"] = false;
+
+          window.initModel("assets/waifu-tips.json");
+        } else {
+          setTimeout(checkIt, 200);
+        }
+      };
+      checkIt();
+    </script>
   </body>
 </html>

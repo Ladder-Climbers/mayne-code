@@ -55,6 +55,9 @@ class User(Resource):
 
 
 class UserInfo(Resource):
+    args_get = reqparse.RequestParser() \
+        .add_argument("key", type=str, help="用户搜索", required=True, location=["args", ])
+
     @auth_required_method
     def post(self, uid: int):
         """
@@ -66,6 +69,11 @@ class UserInfo(Resource):
         if not result:
             return make_result(400)
         return make_result()
+
+    @args_required_method(args_get)
+    def get(self):
+        key = self.args_get.parse_args().get('key', '')
+        return make_result(data={'user_search': db.user.search(key)})
 
 
 class UserUid(Resource):

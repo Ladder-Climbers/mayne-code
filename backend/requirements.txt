@@ -7,3 +7,4 @@ pymongo
 flask-restful
 itsdangerous
 bs4
+tencentcloud-sdk-python

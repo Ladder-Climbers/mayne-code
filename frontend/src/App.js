@@ -56,6 +56,14 @@ import Settings from "./pages/Settings";
 import { api } from './api/api';
 import ListItemLink from './components/ListItemLink';
 import Search from './pages/Search';
+// import record_tools from './utils/record_tools';
+import tencentConfig from "./secrets/tencent_cloud.json";
+import { signCallback } from "./utils/asr/Authentication";
+import { Redirect } from 'react-router-dom';
+
+import WebAudioSpeechRecognizer from './utils/asr/WebAudioSpeechRecognizer';
+// import L2d from './components/L2d';
+import './css/waifu.css';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -165,6 +173,9 @@ function App() {
   const [myMessage, setMyMessage] = React.useState(null);
   const [title, setTitle] = React.useState(titleDefault);
   const [ignored, forceUpdate] = React.useReducer(x => x + 1, 0);
+  const [recorder, setRecorder] = React.useState(null);
+  const [terminalId, setTerminalId] = React.useState("");
+  const [visit, setVisit] = React.useState(null);
   // 拉大到800会打开，拉小到600关闭
   const triggerWidthOpen = 800;
   const triggerWidthClose = 600;
@@ -184,6 +195,105 @@ function App() {
       window.removeEventListener("resize", onWindowResize);
     };
   });
+
+  const recParams = {
+    signCallback: signCallback, // 鉴权函数
+    // 用户参数
+    secretid: tencentConfig.secretid,
+    appid: tencentConfig.appid,
+    // 实时识别接口参数
+    engine_model_type: '16k_zh', // 因为内置WebRecorder采样16k的数据，所以参数 engineModelType 需要选择16k的引擎，为 '16k_zh'
+    // 以下为非必填参数，可跟据业务自行修改
+    voice_format: 1,
+    hotword_id: '08003a00000000000000000000000000',
+    needvad: 1,
+    filter_dirty: 1,
+    filter_modal: 2,
+    filter_punc: 0,
+    convert_num_mode: 1,
+    word_info: 2
+  }
+
+  if (recorder === null) {
+    const rec = new WebAudioSpeechRecognizer(recParams);
+    rec.OnRecognitionStart = (res) => {
+      console.log('开始识别', res);
+    };
+    // 一句话开始
+    rec.OnSentenceBegin = (res) => {
+      console.log('一句话开始', res);
+      window.startMessage(`你说: ……`, 10);
+    };
+    // 识别变化时
+    rec.OnRecognitionResultChange = (res) => {
+      // console.log('识别变化时', res.voice_text_str, res);
+      window.updateMessage(`你说: ${res.voice_text_str}`);
+    };
+    // 一句话结束
+    rec.OnSentenceEnd = (res) => {
+      const text = res.voice_text_str;
+      console.log('一句话结束', res.voice_text_str, res);
+      window.hideMessage();
+      if (text.length === 0) {
+        window.startMessage(`能……再说一遍嘛？`, 10);
+        return;
+      }
+      const tid = localStorage.getItem("mayne_tbp_terminal") || terminalId;
+      api.request('ai/tbp', "POST", { terminal_id: tid, text: text }).then(resp => {
+        const t = resp.data.tbp;
+        if ((t && !t.ResponseMessage.GroupList) || !t) {
+          window.startMessage(`能……再说一遍嘛？`, 10);
+        } else {
+          let textAll = '';
+          for (const r of t.ResponseMessage.GroupList)
+            textAll += r.Content;
+          window.startMessage(`你说: ${text}\n\n${textAll}`, 10);
+          api.request('ai/tts', "GET", { text: textAll }).then(resp2 => {
+            if (!resp2.data.tts) return;
+            const tts = resp2.data.tts;
+            console.log(tts);
+            const audio = new Audio();
+            audio.src = "data:audio/wav;base64," + tts.Audio;
+            audio.play();
+          });
+          if (t.DialogStatus === "COMPLETE") {
+            let target = null;
+            for (const slot of t.SlotInfoList) {
+              if (slot.SlotName === "BookTitle") {
+                // setVisit(`/search?key=${slot.SlotValue}&src=smart_search`);
+                target = slot.SlotValue;
+                break;
+                // window.location.href = `/#/search?key=${slot.SlotValue}&src=local_database`;
+
+              }
+            }
+            if (target) {
+              setTimeout(() => {
+                window.location.href = `/#/search?key=${target}&src=local_database`;
+              }, 2000);
+            }
+          }
+        }
+      });
+      // window.showMessage(`你说: ${res.voice_text_str}\n\n嗯……你再说一遍？`, 4000, 30);
+    };
+    // 识别结束
+    rec.OnRecognitionComplete = (res) => {
+      console.log('识别结束', res);
+    };
+    // 识别错误
+    rec.OnError = (res) => {
+      console.log('识别失败', res)
+    };
+    setRecorder(rec);
+    api.request('ai/tbp', "GET").then(resp => {
+      console.log('GET ai/tbp', resp);
+      setRecorder(rec);
+      setTerminalId(resp.data.terminal_id);
+      localStorage.setItem("mayne_tbp_terminal", resp.data.terminal_id);
+      rec.start();
+    });
+  }
 
   // 注册一个当遇到错误的时候调用的钩子吧，用来显示错误信息
   subscribers['Error'] = function (state) {
@@ -359,7 +469,6 @@ function App() {
           }}
           open={myMessage !== null}
           autoHideDuration={6000}
-          // onClose={(e) => { console.log(e); }}
           message={myMessage}
           action={
             <React.Fragment>
@@ -369,7 +478,13 @@ function App() {
             </React.Fragment>
           }
         />
+        {/* <button onClick={async () => {
+          console.log("terminal_id", terminalId);
+          const resp = await api.request('ai/tbp', "POST", { terminal_id: terminalId, text: "帮我找一本书" });
+          console.log(resp);
+        }}>测试</button> */}
       </ThemeProvider>
+      {/* <audio></audio> */}
     </div>);
 }
 
