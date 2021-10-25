@@ -40,6 +40,7 @@ def auto_time_insert(col: pymongo.collection.Collection,
                      insert_dict: dict):
     dt0 = datetime.datetime.utcnow()
     insert_dict['created_at'] = dt0
+    insert_dict['updated_at'] = dt0
     return col.insert_one(insert_dict)
 
 

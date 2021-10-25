@@ -85,11 +85,13 @@ export default function Recomends() {
     <br />
     <Typography variant="h4">好书推荐</Typography>
     <br />
-    <Grid container spacing={3}>
-      {books.map((v, k) => {
-        return <Grid key={k} item xs={6} sm={4} lg={3}><BookItem book={v}></BookItem></Grid>;
-      })}
-    </Grid>
+    <div style={{ maxHeight: 320, overflow: 'auto', width: "100%", overflowX: "hidden" }}>
+      <Grid container spacing={3}>
+        {books.map((v, k) => {
+          return <Grid key={k} item xs={6} sm={4} lg={3}><BookItem book={v}></BookItem></Grid>;
+        })}
+      </Grid>
+    </div>
     <br></br>
     <LinearProgress color="secondary" style={{ display: (trigger ? "block" : "none") }}></LinearProgress>
   </Box>);

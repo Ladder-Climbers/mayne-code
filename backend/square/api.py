@@ -55,7 +55,9 @@ class SquareMessagesAPI(Resource):
     @auth_required_method
     def post(self, uid: int):
         args = self.args_post.parse_args()
-        db.square_messages.add(uid, args.get('to_uid'), args.get('content'))
+        to_uid = args.get('to_uid')
+        to_uid = int(to_uid) if to_uid is not None else uid
+        db.square_messages.add(uid, to_uid, args.get('content'))
         return make_result()
 
     @auth_required_method
@@ -107,5 +109,16 @@ class SquareDynamicAPI(Resource):
 
 
 class SquareAllAPI(Resource):
+    args_get = reqparse.RequestParser() \
+        .add_argument("offset", help="offset", type=int, required=False, location=["args", ]) \
+        .add_argument("limit", help="limit", type=int, required=False, location=["args", ])
+
+    @args_required_method(args_get)
     def get(self):
-        return make_result(data={'all': db.square_all.find()})
+        args = self.args_get.parse_args()
+        if args.get("offset") is None:
+            args['offset'] = 0
+        if args.get("limit") is None:
+            args['limit'] = Constants.FIND_LIMIT
+        data = db.square_all.find(reverse=True, sort_by="created_at", **args)
+        return make_result(data={'all': data})

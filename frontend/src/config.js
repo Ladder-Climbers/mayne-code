@@ -45,6 +45,7 @@ class Config {
       user: null,
       // 设置同步
       settings_async: true,
+      voice_assistant: true
     };
     this.data = this.data_default;
     this.theme = this.theme_avaliable["默认主题"];

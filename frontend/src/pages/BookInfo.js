@@ -4,7 +4,9 @@ import ShareIcon from '@material-ui/icons/Share';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import ContactMailIcon from '@material-ui/icons/ContactMail';
 import { api } from '../api/api';
-import { getHashedQuery, objectUpdate, parseTime } from "../utils/utils";
+import { getHashedQuery, getUidUser, objectUpdate, parseTime, updateUsers } from "../utils/utils";
+import store from "../data/store";
+import { setMessage } from "../data/action";
 
 function UserSearch(props) {
   const { onSelect } = props;
@@ -27,8 +29,8 @@ function UserSearch(props) {
         <ListItemText primary={user.username}></ListItemText>
       </ListItem>)}
     </List>
-    <TextField value={searchKey} onChange={e => setSearchKey(e.target.value)} variant="outlined"></TextField>
-    <Button color="primary" onClick={() => setRequesting(false)}>搜索</Button>
+    <TextField value={searchKey} fullWidth onChange={e => setSearchKey(e.target.value)} variant="outlined"></TextField>
+    <Button color="primary" fullWidth onClick={() => setRequesting(false)}>搜索</Button>
   </div>;
 }
 
@@ -50,7 +52,7 @@ function UserFriends(props) {
     {users && users.map((user, v) => <ListItem button onClick={() => {
       onSelect && onSelect(user);
     }}>
-      <ListItemText primary={user.username}></ListItemText>
+      <ListItemText primary={getUidUser(user.uid) && user.uid}></ListItemText>
     </ListItem>)}
   </List>;
 }
@@ -114,7 +116,9 @@ function BookOperation(props) {
   const setState = (update) => setInnerState(objectUpdate(state, update));
   if (!info) return null;
   const UserList = (props) => <>
+    <Typography varian="body2" color="textSecondary">搜索用户</Typography>
     <UserSearch {...props}></UserSearch>
+    <Typography varian="body2" color="textSecondary">好友列表</Typography>
     <UserFriends {...props}></UserFriends>
   </>;
   return <div>
@@ -126,13 +130,16 @@ function BookOperation(props) {
         <Typography variant="body2" color="textSecondary">分享此书</Typography>
       </Grid>
       <Grid item xs={4}>
-        <IconButton>
+        <IconButton onClick={async () => {
+          await api.request('square/book_list', "POST", {book_title: info.title, list_name: "默认书单"});
+          store.dispatch(setMessage("加入书单(默认书单)成功！"));
+        }}>
           <PlaylistAddIcon></PlaylistAddIcon>
         </IconButton>
         <Typography variant="body2" color="textSecondary">加入书单</Typography>
       </Grid>
       <Grid item xs={4}>
-        <IconButton>
+        <IconButton onClick={() => setState({ openShare: true })}>
           <ContactMailIcon></ContactMailIcon>
         </IconButton>
         <Typography variant="body2" color="textSecondary">推荐给…</Typography>
@@ -141,27 +148,39 @@ function BookOperation(props) {
     <Dialog open={state.openShare} onClose={() => setState({ openShare: false })}>
       <DialogTitle>分享{info.title}给：</DialogTitle>
       <DialogContent>
-        <UserList></UserList>
+        <UserList onSelect={async (user) => {
+          await api.request('square/messages', "POST", {to_uid: user.uid, content: `分享书籍：${info.title}`});
+          store.dispatch(setMessage("分享成功！"));
+          setState({ openShare: false });
+        }}></UserList>
       </DialogContent>
     </Dialog>
   </div>;
 }
 
-function CommentItem(props) {
+export function CommentItem(props) {
   const { info, comment } = props;
-  const [user, setUser] = React.useState(undefined);
+  // const [user, setUser] = React.useState(getUidUser(comment && comment.uid));
+  const user = getUidUser(comment && comment.uid);
   const [requested, setRequested] = React.useState(false);
-  if (!comment || !info) return null;
-  if (!requested) {
-    setRequested(true);
+  // if (!comment || !info) return null;
+  if (!comment) return null;
+  // if (!requested && !user) {
+  //   setRequested(true);
+  //   api.request(`user/${comment.uid}`, "GET").then(resp => {
+  //     setUser(resp.data.user);
+  //     setRequested(true);
+  //   });
+  // }
+  if (!user && !requested) {
     api.request(`user/${comment.uid}`, "GET").then(resp => {
-      setUser(resp.data.user);
+      updateUsers(resp.data.user);
       setRequested(true);
     });
   }
+  const showInfo = <span>[{(user && user.username) || comment.uid}]{info ? "" : `在[${comment.book_title}]发表了评论`}: {parseTime(comment.updated_at)}</span>;
   return <div>
-    {user ? <Typography varian="body1" color="primary">{user.username}: {parseTime(comment.updated_at)}</Typography> :
-      <Typography varian="body1" color="primary">[{comment.uid}]: {parseTime(comment.updated_at)}</Typography>}
+    <Typography varian="body1" color="primary">{showInfo}</Typography>
     <Typography varian="body2" color="textPrimary" style={{ whiteSpace: 'pre-wrap' }}>{comment.content}</Typography>
   </div>;
 }
@@ -171,12 +190,12 @@ function BookCommentsAdd(props) {
   const [input, setInput] = React.useState("");
   if (!info) return null;
   return <>
-    <TextField multiline variant="outlined" value={input} onChange={e => {
+    <TextField multiline fullWidth variant="outlined" value={input} onChange={e => {
       setInput(e.target.value);
     }}></TextField>
-    <Button color="primary" onClick={async () => {
+    <Button fullWidth color="primary" onClick={async () => {
       api.request('square/comments', "POST", { book_title: info.title, content: input }).then(resp => {
-        window.location.reload();
+        
       });
     }}>发送书评</Button>
   </>;

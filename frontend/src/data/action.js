@@ -16,6 +16,12 @@ export function setUser(data) {
   };
 }
 
+export function setUsers(data) {
+  return dispatch => {
+    dispatch({ type: "SET_USERS", data: data });
+  };
+}
+
 export function setDaemon(data) {
   return dispatch => {
     dispatch({ type: "SET_DAEMON", data: data });

@@ -1,5 +1,7 @@
 import moment from 'moment';
 import 'moment/locale/zh-cn'
+import { setUsers } from '../data/action';
+import store from '../data/store';
 
 export function isMobileDevice() {
   const sUserAgent = navigator.userAgent;
@@ -39,6 +41,15 @@ export function urlEncode2(obj) {
 
 export function getHashedQuery() {
   return [...new URL('http://localhost' + window.location.hash.slice(1)).searchParams];
+}
+
+export function parseHashedQuery() {
+  const queryList = getHashedQuery();
+  let query = {};
+  for (const q of queryList) {
+    query[q[0]] = q[1];
+  }
+  return query;
 }
 
 export function parseTimePoint(time) {
@@ -144,4 +155,15 @@ export function shuffle(arr) {
     _arr[j] = t;
   }
   return _arr;
+}
+
+export function updateUsers(user) {
+  let users = store.getState().users;
+  users[user.uid] = user;
+  store.dispatch(setUsers(users));
+}
+
+export function getUidUser(uid) {
+  const users = store.getState().users;
+  return users[uid];
 }

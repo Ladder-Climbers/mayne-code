@@ -99,6 +99,8 @@ export default class SpeechRecognizer {
           this.OnError('连接未建立或连接已关闭');
           if (this.socket && this.socket.readyState === 1) {
             this.socket.close();
+          } else {
+            this.OnError("Cannot close socket!")
           }
         }
     }

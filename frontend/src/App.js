@@ -20,6 +20,7 @@ import LiveHelpIcon from '@material-ui/icons/LiveHelp';
 import GroupIcon from '@material-ui/icons/Group';
 import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import ForumIcon from '@material-ui/icons/Forum';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -64,6 +65,9 @@ import { Redirect } from 'react-router-dom';
 import WebAudioSpeechRecognizer from './utils/asr/WebAudioSpeechRecognizer';
 // import L2d from './components/L2d';
 import './css/waifu.css';
+
+import MuiSwitch from '@material-ui/core/Switch';
+import Me from './pages/Me';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -164,6 +168,47 @@ store.subscribe(async () => {
   }
 });
 
+let recStarted = false;
+let tbpStarted = false;
+
+const setupRecorder = (rec, onSentenceEnd) => {
+  rec.OnRecognitionStart = (res) => {
+    console.log('开始识别', res);
+  };
+  // 一句话开始
+  rec.OnSentenceBegin = (res) => {
+    console.log('一句话开始', res);
+    recStarted = true;
+    window.startMessage(`你说: ……`, 10);
+  };
+  // 识别变化时
+  rec.OnRecognitionResultChange = (res) => {
+    if (!recStarted) {
+      return;
+    }
+    // console.log('识别变化时', res.voice_text_str, res);
+    window.updateMessage(`你说: ${res.voice_text_str}`);
+  };
+  // 一句话结束
+  rec.OnSentenceEnd = (res) => {
+    if (recStarted === false) {
+      console.warn("recStarted", res);
+      return;
+    }
+    recStarted = false;
+    onSentenceEnd(res);
+  };
+  // 识别结束
+  rec.OnRecognitionComplete = (res) => {
+    console.log('识别结束', res);
+  };
+  // 识别错误
+  rec.OnError = (res) => {
+    console.log('识别失败', res)
+    // rec.start();
+  };
+}
+
 function App() {
   const classes = useStyles();
   const theme = useTheme();
@@ -173,7 +218,7 @@ function App() {
   const [myMessage, setMyMessage] = React.useState(null);
   const [title, setTitle] = React.useState(titleDefault);
   const [ignored, forceUpdate] = React.useReducer(x => x + 1, 0);
-  const [recorder, setRecorder] = React.useState(null);
+  // const [recorder, setRecorder] = React.useState(null);
   const [terminalId, setTerminalId] = React.useState("");
   const [visit, setVisit] = React.useState(null);
   // 拉大到800会打开，拉小到600关闭
@@ -196,103 +241,127 @@ function App() {
     };
   });
 
-  const recParams = {
-    signCallback: signCallback, // 鉴权函数
-    // 用户参数
-    secretid: tencentConfig.secretid,
-    appid: tencentConfig.appid,
-    // 实时识别接口参数
-    engine_model_type: '16k_zh', // 因为内置WebRecorder采样16k的数据，所以参数 engineModelType 需要选择16k的引擎，为 '16k_zh'
-    // 以下为非必填参数，可跟据业务自行修改
-    voice_format: 1,
-    hotword_id: '08003a00000000000000000000000000',
-    needvad: 1,
-    filter_dirty: 1,
-    filter_modal: 2,
-    filter_punc: 0,
-    convert_num_mode: 1,
-    word_info: 2
-  }
+  const assistantStart = store.getState().config.data.api_token.access_token ?
+    (store.getState().config.data.voice_assistant ? false : null) : null;
+  window.started = assistantStart;
+  const assistantEnable = assistantStart === false;
+  // console.log('window.started', window.started);
 
-  if (recorder === null) {
-    const rec = new WebAudioSpeechRecognizer(recParams);
-    rec.OnRecognitionStart = (res) => {
-      console.log('开始识别', res);
-    };
-    // 一句话开始
-    rec.OnSentenceBegin = (res) => {
-      console.log('一句话开始', res);
-      window.startMessage(`你说: ……`, 10);
-    };
-    // 识别变化时
-    rec.OnRecognitionResultChange = (res) => {
-      // console.log('识别变化时', res.voice_text_str, res);
-      window.updateMessage(`你说: ${res.voice_text_str}`);
-    };
-    // 一句话结束
-    rec.OnSentenceEnd = (res) => {
-      const text = res.voice_text_str;
-      console.log('一句话结束', res.voice_text_str, res);
-      window.hideMessage();
-      if (text.length === 0) {
-        window.startMessage(`能……再说一遍嘛？`, 10);
-        return;
-      }
-      const tid = localStorage.getItem("mayne_tbp_terminal") || terminalId;
-      api.request('ai/tbp', "POST", { terminal_id: tid, text: text }).then(resp => {
-        const t = resp.data.tbp;
-        if ((t && !t.ResponseMessage.GroupList) || !t) {
+  if (assistantEnable) {
+    const recParams = {
+      signCallback: signCallback, // 鉴权函数
+      // 用户参数
+      secretid: tencentConfig.secretid,
+      appid: tencentConfig.appid,
+      // 实时识别接口参数
+      engine_model_type: '16k_zh', // 因为内置WebRecorder采样16k的数据，所以参数 engineModelType 需要选择16k的引擎，为 '16k_zh'
+      // 以下为非必填参数，可跟据业务自行修改
+      voice_format: 1,
+      hotword_id: '08003a00000000000000000000000000',
+      needvad: 1,
+      filter_dirty: 1,
+      filter_modal: 2,
+      filter_punc: 0,
+      convert_num_mode: 1,
+      word_info: 2
+    }
+
+    // const globalRec = window.rec;
+
+    if (!window.rec) {
+      const rec = new WebAudioSpeechRecognizer(recParams);
+      window.rec = rec;
+      const onSentenseEnd = (res) => {
+        const text = res.voice_text_str;
+        console.log('一句话结束', res.voice_text_str, res);
+        window.hideMessage();
+        if (text.length === 0) {
           window.startMessage(`能……再说一遍嘛？`, 10);
-        } else {
-          let textAll = '';
-          for (const r of t.ResponseMessage.GroupList)
-            textAll += r.Content;
-          window.startMessage(`你说: ${text}\n\n${textAll}`, 10);
-          api.request('ai/tts', "GET", { text: textAll }).then(resp2 => {
-            if (!resp2.data.tts) return;
-            const tts = resp2.data.tts;
-            console.log(tts);
-            const audio = new Audio();
-            audio.src = "data:audio/wav;base64," + tts.Audio;
-            audio.play();
-          });
-          if (t.DialogStatus === "COMPLETE") {
-            let target = null;
-            for (const slot of t.SlotInfoList) {
-              if (slot.SlotName === "BookTitle") {
-                // setVisit(`/search?key=${slot.SlotValue}&src=smart_search`);
-                target = slot.SlotValue;
-                break;
-                // window.location.href = `/#/search?key=${slot.SlotValue}&src=local_database`;
+          return;
+        }
+        if (tbpStarted) return;
+        tbpStarted = true;
+        // rec.speechRecognizer.stop();
+        // rec.stop();
+        // delete window.rec;
+        // window.rec = null;
+        if (!window.blocked) {
+          window.blocked = true;
+          const tid = localStorage.getItem("mayne_tbp_terminal") || terminalId;
+          api.request('ai/tbp', "POST", { terminal_id: tid, text: text }).then(resp => {
+            const t = resp.data.tbp;
+            if ((t && !t.ResponseMessage.GroupList) || !t) {
+              window.startMessage(`能……再说一遍嘛？`, 10);
+            } else {
+              let textAll = '';
+              for (const r of t.ResponseMessage.GroupList)
+                textAll += r.Content;
+              api.request('ai/tts', "GET", { text: textAll }).then(resp2 => {
+                tbpStarted = false;
+                window.startMessage(`你说: ${text}\n\n${textAll}`, 10);
+                if (!resp2.data.tts) {
+                  return;
+                }
+                const tts = resp2.data.tts;
+                console.log(tts);
+                const audio = new Audio();
+                audio.autoplay = "autoplay";
+                audio.src = "data:audio/wav;base64," + tts.Audio;
+                // rec.recorder.stop();
+                // rec.speechRecognizer.stop();
+                audio.oncanplaythrough = async () => {
+                  audio.play();
+                  // Length = (Size - 44) * 8 / (Rate * 1000 * Precision * Channerls)
+                  // len(s) = (size - 44) * 8 / (16 * 1000 * 32 * 2)
+                  const time_ms = ((window.atob(tts.Audio).length) * 4 - 44) * 8 / (16 * 1000 * 32 * 2) * 1000 + 1000;
+                  console.log('sleep for', time_ms, 'ms');
+                  await sleep(time_ms);
+                  window.blocked = false;
+                  // rec.recorder.start();
+                  // rec.speechRecognizer.start();
+                  // if (!window.rec) {
+                  //   const rec2 = new WebAudioSpeechRecognizer(recParams);
+                  //   window.rec = rec2;
+                  //   setupRecorder(rec2, onSentenseEnd);
+                  //   rec2.start();
+                  // }
+                  // setRecorder(rec2);
 
+                  // rec.start();
+                };
+              });
+              if (t.DialogStatus === "COMPLETE") {
+                let target = null;
+                for (const slot of t.SlotInfoList) {
+                  if (slot.SlotName === "BookTitle") {
+                    // setVisit(`/search?key=${slot.SlotValue}&src=smart_search`);
+                    target = slot.SlotValue;
+                    break;
+                    // window.location.href = `/#/search?key=${slot.SlotValue}&src=local_database`;
+
+                  }
+                }
+                if (target) {
+                  setTimeout(() => {
+                    window.location.href = `/#/search?key=${target}&src=local_database`;
+                  }, 2000);
+                }
               }
             }
-            if (target) {
-              setTimeout(() => {
-                window.location.href = `/#/search?key=${target}&src=local_database`;
-              }, 2000);
-            }
-          }
+          });
         }
+
+      };
+      setupRecorder(rec, onSentenseEnd);
+      // setRecorder(rec);
+      api.request('ai/tbp', "GET").then(resp => {
+        console.log('GET ai/tbp', resp);
+        // setRecorder(rec);
+        setTerminalId(resp.data.terminal_id);
+        localStorage.setItem("mayne_tbp_terminal", resp.data.terminal_id);
+        rec.start();
       });
-      // window.showMessage(`你说: ${res.voice_text_str}\n\n嗯……你再说一遍？`, 4000, 30);
-    };
-    // 识别结束
-    rec.OnRecognitionComplete = (res) => {
-      console.log('识别结束', res);
-    };
-    // 识别错误
-    rec.OnError = (res) => {
-      console.log('识别失败', res)
-    };
-    setRecorder(rec);
-    api.request('ai/tbp', "GET").then(resp => {
-      console.log('GET ai/tbp', resp);
-      setRecorder(rec);
-      setTerminalId(resp.data.terminal_id);
-      localStorage.setItem("mayne_tbp_terminal", resp.data.terminal_id);
-      rec.start();
-    });
+    }
   }
 
   // 注册一个当遇到错误的时候调用的钩子吧，用来显示错误信息
@@ -315,6 +384,7 @@ function App() {
   subscribers['User'] = function (state) {
     if (state.user) {
       if (JSON.stringify(state.user) != JSON.stringify(last_data.user)) {
+        console.log('Got user', state.user);
         forceUpdate();
       }
       last_data.user = state.user;
@@ -352,13 +422,23 @@ function App() {
         <Typography variant="h6" noWrap className={classes.title}>
           {title}
         </Typography>
-        <IconButton
+        {/* <IconButton
           color="inherit"
           aria-label="login"
           onClick={() => { }}
         >
           <AccountCircleIcon />
-        </IconButton>
+        </IconButton> */}
+        <Typography variant="body2">语音助手</Typography>
+        <MuiSwitch
+          checked={store.getState().config.data.voice_assistant}
+          onChange={e => {
+            let c = store.getState().config;
+            console.log(e);
+            c.data.voice_assistant = e.target.checked;
+            c.save();
+            window.location.reload();
+          }}></MuiSwitch>
       </Toolbar>
     </AppBar>
     <Drawer
@@ -389,6 +469,7 @@ function App() {
         <ListItemLink to="/search" primary="找书" icon={<SearchIcon />} />
         <ListItemLink to="/library" primary="馆藏" icon={<LibraryBooksIcon />} />
         <ListItemLink to="/square" primary="广场" icon={<DynamicFeedIcon />} />
+        <ListItemLink to="/me" primary="我的" icon={<ForumIcon />} />
         <ListItemLink to="/settings" primary="设置" icon={<SettingsIcon />} />
         <ListItemLink to="/help" primary="帮助" icon={<LiveHelpIcon />} />
         <ListItemLink to="/about" primary="关于" icon={<GroupIcon />} />
@@ -411,6 +492,9 @@ function App() {
         </Route>
         <Route path={"/square"} exact={true}>
           <Square></Square>
+        </Route>
+        <Route path={"/me"} exact={true}>
+          <Me></Me>
         </Route>
         <Route path={"/help"} exact={true}>
           <Help></Help>
@@ -467,8 +551,9 @@ function App() {
             vertical: 'bottom',
             horizontal: 'right',
           }}
+          onClose={() => setMyMessage(null)}
           open={myMessage !== null}
-          autoHideDuration={6000}
+          autoHideDuration={4000}
           message={myMessage}
           action={
             <React.Fragment>

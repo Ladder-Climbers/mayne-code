@@ -5,6 +5,7 @@ const defaultState = {
   config: new Config(),
   tasks: [],
   user: null,
+  users: {},
   daemon: null,
   errorInfo: null,
   message: null,
@@ -23,6 +24,15 @@ function config(state = defaultState.config, action) {
 function user(state = defaultState.user, action) {
   switch (action.type) {
     case "SET_USER":
+      return action.data;
+    default:
+      return state;
+  }
+}
+
+function users(state = defaultState.users, action) {
+  switch (action.type) {
+    case "SET_USERS":
       return action.data;
     default:
       return state;
@@ -75,4 +85,4 @@ function searchInfo(state = defaultState.searchInfo, action) {
   }
 }
 
-export default combineReducers({ config, errorInfo, message, daemon, user, tasks, searchInfo });
+export default combineReducers({ config, errorInfo, message, daemon, user, users, tasks, searchInfo });

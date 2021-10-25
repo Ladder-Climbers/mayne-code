@@ -69,6 +69,7 @@ class SearchAPI(Resource):
                                                offset=page * Constants.FIND_LIMIT, limit=Constants.FIND_LIMIT)
                 return make_result(data={'search': {"local_database": {"books": data, "count": len(data)}}})
         loop = asyncio.get_event_loop()
+        logger.warning(f"rpcs_search: {key}")
         resp = loop.run_until_complete(rpcs_search(key, page=page, srcs=srcs))
         # return make_result(data={'search': resp['result']['books']})
         if resp is None:

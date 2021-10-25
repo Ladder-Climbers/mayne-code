@@ -9,6 +9,7 @@ import Slides from '../components/Slides';
 import history from "../utils/history";
 import { urlEncode } from '../utils/utils';
 import { Redirect } from 'react-router-dom';
+import Square from './Square';
 export default function Dashboard(props) {
   const [visit, setVisit] = React.useState(null);
   if (visit) {
@@ -24,13 +25,13 @@ export default function Dashboard(props) {
         }}></SearchBox>
       </Box>
     </Box>
-    <br />
-    <Divider></Divider>
+    {/* <br /> */}
+    {/* <Divider></Divider> */}
     {/* <Slides></Slides> */}
-    <br />
-    <Divider></Divider>
-    <br />
-    <Grid container spacing={10}>
+    {/* <br /> */}
+    {/* <Divider></Divider> */}
+    {/* <br /> */}
+    {/* <Grid container spacing={10}>
       <Grid item lg={6} sm={12} style={{ padding: 20 }}>
         <PopularAuthors></PopularAuthors>
       </Grid>
@@ -38,9 +39,14 @@ export default function Dashboard(props) {
         <PopularTags></PopularTags>
       </Grid>
     </Grid>
-    <br />
-    <Divider></Divider>
+    <br /> */}
+    {/* <Divider></Divider> */}
     <br />
     <Recomends></Recomends>
+    <br />
+    <Typography variant="h4">
+      交流广场
+    </Typography>
+    <Square child></Square>
   </Container>);
 };

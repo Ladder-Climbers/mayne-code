@@ -39,6 +39,14 @@ function Settings(props) {
       <ListItem button>
         <ListItemText primary="修改信息"></ListItemText>
       </ListItem>
+      <ListItem button onClick={() => {
+        let c = store.getState().config;
+        c.data = c.data_default;
+        c.save();
+        window.location.reload();
+      }}>
+        <ListItemText primary="退出登录"></ListItemText>
+      </ListItem>
       <ListSubheader>外观</ListSubheader>
       <ListItem>
         <ListItemText primary="主题设置"></ListItemText>
@@ -78,7 +86,7 @@ function Settings(props) {
       </ListItem>
     </List>
     <ListInfo data={store.getState().user} open={openUser} keyNames={{
-      username: '用户名', nick: '昵称', phone: '用户手机号', profile: '详细信息', state: '用户状态', created_at: '创建于', updated_at: '更新于'
+      username: '用户名', nick: '昵称', phone: '手机号', profile: '详细信息', state: '用户状态', created_at: '创建于', updated_at: '更新于'
     }} title="用户信息" onClose={() => { setOpenUser(false); }}></ListInfo>
     <Dialog open={resetSettingsOpen} onClose={() => setResetSettingsOpen(false)}>
       <DialogTitle>
