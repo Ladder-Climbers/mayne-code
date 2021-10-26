@@ -87,6 +87,7 @@ export default function BookItem(props) {
         }}>
           {book.author}
         </Typography>
+        {book.rating && (book.rating.value === 0 ? null : 1) && book.rating.value && <Typography vatiant="body2" color="textSecondary">{book.rating.value}分</Typography>}
       </Box>
       <IconButton
         className={clsx(classes.expand, {

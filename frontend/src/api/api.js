@@ -15,7 +15,7 @@ class API {
     // this.access_token = '';
     // this.refresh_token = '';
 
-    this.host = window.location.href.includes("localhost") ? "localhost" : "pc.chiro.work";
+    this.host = window.location.href.includes("localhost") ? "localhost" : null;
     this.port = 443;
     this.api_version = "v1";
     this.api_prefix = `/api/${this.api_version}`;

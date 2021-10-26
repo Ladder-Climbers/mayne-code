@@ -6,11 +6,15 @@ def rpc_call(name):
     payload = {
         'jsonrpc': '2.0',
         'id': random.randint(1, 10),
-        'method': 'BookFinder.FindBook',
+        'method': 'BookFinder.GetDoubanItems',
         'params': {
-            'keyword': name,
-            'count': 5
-        }
+  "books": [
+    {
+      "title": name,
+      "req_id": 1
+    }
+  ]
+}
     }
 
     r = requests.post(url, json=payload)

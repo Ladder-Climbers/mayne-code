@@ -45,7 +45,7 @@ if __name__ == '__main__':
     start_all()
     ssl_context = Constants.SSL_CONTEXT
     if Constants.RUN_FRONTEND_PROXY:
-        logger.info(f'server started at {host}:{port} (shadow at {host}:{shadow_port})')
+        logger.info(f'server started at {host}:{port} (shadow at {host}:{shadow_port}) ssl={ssl_context}')
         run_kwargs = {
             'use_reloader': Constants.RUN_USE_RELOAD,
             # 'ssl_context': 'adhoc'
@@ -60,4 +60,5 @@ if __name__ == '__main__':
         for t in [t1, t2]:
             t.join()
     else:
+        logger.info(f'server started at {host}:{port} ssl={ssl_context}')
         run_simple(host, port, dm, use_reloader=Constants.RUN_USE_RELOAD, ssl_context=ssl_context)

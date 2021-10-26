@@ -13,6 +13,7 @@ def get_search_params(src: str, key: str, page: int = 0):
     if params_type == 'rpc_smart_search':
         return [{
             'type': 'request',
-            'request': key,
-            'count': Constants.FIND_LIMIT
+            'keyword': key,
+            'count': Constants.FIND_LIMIT // 5
+            # 'count': 3
         }]

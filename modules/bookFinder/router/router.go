@@ -19,7 +19,7 @@ func init() {
 	bf := new(api.BookFinder)
 	err := s.RegisterService(bf, "")
 	if err != nil {
-		log.Println("Error(s) occurred while registering service.")
+		log.Println("Error(s) occurred while registering service:", err.Error())
 		os.Exit(1)
 	}
 	Router = mux.NewRouter()

@@ -21,7 +21,6 @@ func parseBooks(url string, bookList map[string]int, errchan chan error) {
 	req.Header.Set("Cookie", args.HeaderArgs.Cookie)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Error(s) occurred while making requests:", err)
 		errchan <- err
 		return
 	}
@@ -55,17 +54,15 @@ func FindBook(platform, keyword string, blist map[string]int, errchan chan error
 	}
 
 	// 开新的协程
-	errchan2 := make(chan error)
+	visitWebsiteError := make(chan error)
 	for _, link := range bingResult {
-		go parseBooks(link, blist, errchan2)
+		go parseBooks(link, blist, visitWebsiteError)
 	}
 	for _, _ = range bingResult {
-		//err := <-errchan2
-		/*		if err != nil {
-				errchan <- err
-				return
-			}*/
-		<-errchan2
+		visitErr := <-visitWebsiteError
+		if visitErr != nil {
+			log.Println("There's an error:", visitErr.Error())
+		}
 	}
 	errchan <- nil
 }

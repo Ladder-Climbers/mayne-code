@@ -58,8 +58,10 @@ class Constants:
     # API config
     API_PATH = '/api/v1'
     # SSL
-    SSL_CONTEXT = ("./pc.chiro.work.pem", "./pc.chiro.work.key")
+    # SSL_CONTEXT = ("./keys/pc.chiro.work.pem", "./keys/pc.chiro.work.key")
+    # SSL_CONTEXT = ("./keys/mayne.chiro.work.pem", "./keys/mayne.chiro.work.key")
     # SSL_CONTEXT = None
+    SSL_CONTEXT = ("./keys/mayne.chiro.work.pem", "./keys/mayne.chiro.work.key") if ENVIRONMENT == 'dev' else None
     # Running config
     RUN_LISTENING = "0.0.0.0"
     RUN_PORT = int(os.environ.get("PORT", 8080)) if SSL_CONTEXT is None else 443
@@ -86,7 +88,9 @@ class Constants:
         'smart_search': {
             'type': 'rpc',
             'params_type': 'rpc_smart_search',
-            'call_name': 'BookFinder.FindBook',
+            # 'call_name': 'BookFinder.FindBook',
+            'call_name': 'BookFinder.GetBookTitles',
+            'call_name2': 'BookFinder.GetDoubanItems',
             'name': '智能搜索'
         },
         'bing': {

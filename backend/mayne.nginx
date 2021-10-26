@@ -1,16 +1,15 @@
 server {
-	listen 80;
-	listen [::]:80;
-
-	server_name meiri.chiro.work;
-
-	root /home/chiro/gits/meiri100/backend/public/;
+	listen 443 ssl;
+	server_name mayne.chiro.work;
+	ssl_certificate /home/chiro/gits/mayne-code/backend/keys/mayne.chiro.work.pem;
+	ssl_certificate_key /home/chiro/gits/mayne-code/backend/keys/mayne.chiro.work.key;
+	root /home/chiro/gits/mayne-code/backend/public/;
 	index index.html;
 	location / {
 		try_files $uri $uri/ =404;
 	}
 	location ^~ /api {
-		proxy_pass http://localhost:8088;
+		proxy_pass http://localhost:8080;
 	}
 }
 

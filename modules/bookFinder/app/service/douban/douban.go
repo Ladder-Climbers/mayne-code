@@ -6,26 +6,22 @@ import (
 	"bookFinder/app/service/limit"
 	"bytes"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/gorilla/rpc/v2/json2"
 )
 
-/**
- * 豆瓣图书搜索
- * @param bookName 书名
- * @param bookCount 出现次数
- * @param ranking 原来排序的编号
- * @param booksChannel 结果返回通道
- */
-func DoubanSearch(bookName string, bookCount int, ranking int, booksChannel chan types.Book) {
+func DoubanSearch(bookName string, reqID int, bookChannel chan types.DoubanAnswer) {
 	url := "http://localhost:" + strconv.Itoa(args.DoubPort) + args.DoubAPI
 	keyword := []string{bookName}
 
 	message, err := json2.EncodeClientRequest("search", keyword)
 	if err != nil {
-		booksChannel <- types.Book{
-			Error: err,
+		bookChannel <- types.DoubanAnswer{
+			ReqID:      reqID,
+			Error:      err,
+			AnswerList: nil,
 		}
 		return
 	}
@@ -33,8 +29,10 @@ func DoubanSearch(bookName string, bookCount int, ranking int, booksChannel chan
 	resp, err := http.Post(url, "application/json;charset=UTF-8", bytes.NewReader(message))
 	<-limit.Douban
 	if err != nil {
-		booksChannel <- types.Book{
-			Error: err,
+		bookChannel <- types.DoubanAnswer{
+			ReqID:      reqID,
+			Error:      err,
+			AnswerList: nil,
 		}
 		return
 	}
@@ -42,25 +40,25 @@ func DoubanSearch(bookName string, bookCount int, ranking int, booksChannel chan
 
 	var books []types.Book
 	err = json2.DecodeClientResponse(resp.Body, &books)
+
 	if err != nil {
-		booksChannel <- types.Book{
-			Error: err,
+		bookChannel <- types.DoubanAnswer{
+			ReqID:      reqID,
+			Error:      err,
+			AnswerList: nil,
 		}
 		return
 	}
 
-	var simBook types.Book
-	minDistance := 32767
-	for _, b := range books {
-		nowDistance := getLevenshteinDistance(b.Title, bookName)
-		if nowDistance < minDistance {
-			simBook = b
-			minDistance = nowDistance
-		}
+	sort.Slice(books, func(i, j int) bool {
+		return getLevenshteinDistance(books[i].Title, bookName) < getLevenshteinDistance(books[j].Title, bookName)
+	})
+
+	bookChannel <- types.DoubanAnswer{
+		ReqID:      reqID,
+		Error:      nil,
+		AnswerList: books,
 	}
-	simBook.Ranking = ranking
-	simBook.PresenceCount = bookCount
-	booksChannel <- simBook
 }
 
 func intMin(args ...int) int {

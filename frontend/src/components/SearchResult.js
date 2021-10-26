@@ -6,11 +6,12 @@ function SmartSearchResult(props) {
   const { books } = props;
   // console.log('books', books);
   return <Grid container spacing={3}>
-    {books.map((book, k) => <Grid key={k} item xs={12} sm={6} lg={3}><BookItem book={{
+    {books && books.map((book, k) => <Grid key={k} item xs={12} sm={6} lg={3}><BookItem book={{
       title: book.title,
       author: book.abstract,
       desc: null,
-      cover: book.cover_url
+      cover: book.cover_url,
+      rating: book.rating
     }}></BookItem></Grid>)}
   </Grid>;
 }
@@ -18,7 +19,7 @@ function SmartSearchResult(props) {
 function DoubanResult(props) {
   const { books } = props;
   return <Grid container spacing={3}>
-    {books.map((book, k) => <Grid key={k} item xs={12} sm={6} lg={3}><BookItem book={{
+    {books && books.map((book, k) => <Grid key={k} item xs={12} sm={6} lg={3}><BookItem book={{
       title: book.title,
       author: book.abstract,
       desc: null,
@@ -31,7 +32,7 @@ export function LocalDatabaseResult(props) {
   const { books } = props;
   console.log('local props', props);
   return <Grid container spacing={3}>
-    {books.map((book, k) => <Grid key={k} item xs={12} sm={6} lg={3}><BookItem book={{
+    {books && books.map((book, k) => <Grid key={k} item xs={12} sm={6} lg={3}><BookItem book={{
       title: book.title,
       author: book.base_info,
       desc: book.description,
