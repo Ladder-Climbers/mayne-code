@@ -64,7 +64,7 @@ class Constants:
     SSL_CONTEXT = ("./keys/mayne.chiro.work.pem", "./keys/mayne.chiro.work.key") if ENVIRONMENT == 'dev' else None
     # Running config
     RUN_LISTENING = "0.0.0.0"
-    RUN_PORT = int(os.environ.get("PORT", 8080)) if SSL_CONTEXT is None else 443
+    RUN_PORT = int(os.environ.get("PORT", 8980)) if SSL_CONTEXT is None else 443
     RUN_USE_RELOAD = False
     RUN_FRONTEND_PROXY = False
     # RUN_REBASE = True
