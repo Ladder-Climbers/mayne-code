@@ -81,7 +81,9 @@ class Constants:
     # 模块遇到错误是否重启重新执行n次
     MODULES_RUN_RETRY = 3
     # 是否模块退出了仍然执行该模块
-    MODULES_RUN_FOREVER = True
+    # MODULES_RUN_FOREVER = True
+    # 会卡死的啊
+    MODULES_RUN_FOREVER = False
     # Search
     SEARCH_DEFAULT = "smart_search"
     SEARCH_SRC = {

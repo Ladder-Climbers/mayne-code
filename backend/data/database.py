@@ -3,6 +3,7 @@ import traceback
 import os
 # from utils.logger import logger
 from data.tools import *
+from search.database import SearchDB
 from square.database import *
 
 from user.database import *
@@ -13,7 +14,7 @@ from sync.database import *
 class DataBase:
     # 用到的所有数据集合
     COLLECTIONS = [
-        'user', 'user_uid', 'mayne_bug', 'session', 'session_disabled_token', 'sync', 'square'
+        'user', 'user_uid', 'mayne_bug', 'session', 'session_disabled_token', 'sync', 'square', 'search'
     ]
 
     def __init__(self, dismiss_rebase=False):
@@ -30,6 +31,7 @@ class DataBase:
         self.square_dynamic: SquareDynamicDB = None
         self.square_logs: SquareLogsDB = None
         self.square_all: SquareAllDB = None
+        self.search: SearchDB = None
         self.connect_init()
         self.init_parts()
         if Constants.RUN_REBASE and not dismiss_rebase:
@@ -47,6 +49,7 @@ class DataBase:
         self.square_book_list = SquareBookListDB(self.db)
         self.square_messages = SquareMessagesDB(self.db)
         self.square_all = SquareAllDB(self.db)
+        self.search = SearchDB(self.db)
 
     def rebase(self):
         logger.warning('Rebasing...')
